@@ -9,4 +9,4 @@ You can read all about what you're allowed to and not do in the [LICENSE](https:
 
 ##Usage
 
-If you're another Robotics team competing in a VEX competition, you're free to use this code, either in its entirety or any part of it, as long as you make your code open source, and credit us where the credit is due. Same goes for everyone else, but I haven't heard of these things being built for anything else
+If you're another Robotics team competing in a VEX competition, you're free to use this code, either in its entirety or any part of it, as long as you make your code open source, and credit us where the credit is due. Same goes for everyone else, but I haven't heard of these things being built for anything else. Just compile mainRename.c, and make sure that all of its includes are where they're supposed to be

@@ -1,4 +1,5 @@
-#pragma config(Sensor, dgtl12, intakePneumatics, sensorDigitalOut)
+#pragma config(Sensor, dgtl11, tubePneumatics, sensorDigitalOut)
+#pragma config(Sensor, dgtl12, blockPneumatics, sensorDigitalOut)
 #pragma config(Motor,  port1,           rtLift,        tmotorVex393_HBridge, openLoop)
 #pragma config(Motor,  port2,           lfDrive,       tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port3,           lbDrive,       tmotorVex393_MC29, openLoop, encoderPort, None)
@@ -162,14 +163,17 @@ task usercontrol(){
 			lift(0);
 		}
 		//Intake
-		if(vexRT[Btn5U]){
-			if(SensorValue[intakePneumatics] == 1){
-				SensorValue[intakePneumatics] = 0;
-			}
-			//It's safe to assume that intakePneumatics is currently equal to 0
-			else{
-				SensorValue[intakePneumatics] = 1;
-			}
+		if(vexRT[Btn7R]){
+			SensorValue[blockPneumatics] = true;
+		}
+		if(vexRT[Btn7D]){
+			SensorValue[blockPneumatics] = false;
+		}
+		if(vexRT[Btn8L]){
+			SensorValue[tubePneumatics] = true;
+		}
+		if(vexRT[Btn8D]){
+			SensorValue[tubePneumatics] = false;
 		}
 	}
 }

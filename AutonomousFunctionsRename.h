@@ -12,7 +12,7 @@ void resetEncoders(){                        //Clears drive encoders
 /////////////////////////////////////////////////////////////////////////////////////////
 void basicDrive(int leftPower, int rightPower){
 	motor[lfDrive] = motor[lbDrive] = leftPower;
-  motor[rfDrive] = motor[rbDrive] = rightPower;
+ motor[rfDrive] = motor[rbDrive] = rightPower;
 }
 /////////////////////////////////////////////////////////////////////////////////////////
 //**Drive**/
@@ -77,7 +77,7 @@ void encoderDriveWithLift(int power, int encoderCount, int position){
     }
   }
   //Slow down near destination
-  while(abs(nMotorEncoder[lbDrive]) < encoderCount && abs(nMotorEncoder[rbDrive]) < encoderCount){
+while(abs(nMotorEncoder[lbDrive]) < encoderCount && abs(nMotorEncoder[rbDrive]) < encoderCount){
   	drive(power);
    	if(nMotorEncoder[lbDrive] >= encoderCount){
     	motor[lbDrive]=motor[lfDrive] = 0;

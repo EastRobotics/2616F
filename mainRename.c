@@ -29,16 +29,16 @@ This file is the main link of the program, it has the button controls and specif
 #include "battery.h"
 void lift(int power);
 void pre_auton(){
-	//clearLCDLine(1);
-	//clearLCDLine(2);
-	//displayLCDVoltageString(1);
-	//displayLCDCenteredString(0, "This displayed");
+	clearLCDLine(0);
+	clearLCDLine(1);
+	displayLCDVoltageString(0);
+	displayLCDCenteredString(0, "This displayed");
 }
 task autonomous(){
-	//clearLCDLine(1);
-	//clearLCDLine(2);
-	//displayLCDCenteredString(0, "Hi");
-	//displayLCDVoltageString(1);
+	clearLCDLine(0);
+	clearLCDLine(1);
+	displayLCDCenteredString(0, "Hi");
+	displayLCDVoltageString(1);
 	/*
 	//lift for 2 seconds
 	motor[rtLift] = motor[rmLift] = motor[rlLift] = motor[ltLift] = motor[lmLift] = motor[llLift] = 127;

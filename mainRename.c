@@ -1,4 +1,4 @@
-#pragma config(Sensor, dgtl11, tubePneumatics, sensorDigitalOut)
+#pragma config(Sensor, dgtl11, expander,       sensorDigitalIn)
 #pragma config(Sensor, dgtl12, blockPneumatics, sensorDigitalOut)
 #pragma config(Motor,  port1,           rtLift,        tmotorVex393_HBridge, openLoop)
 #pragma config(Motor,  port2,           lfDrive,       tmotorVex393_MC29, openLoop)
@@ -22,15 +22,23 @@ This file is the main link of the program, it has the button controls and specif
 #pragma competitionControl(Competition)
 #pragma autonomousDuration(20)
 #pragma userControlDuration(120)
-#include "Vex_Competition_Includes_patched.c"
+#include "Vex_Competition_Includes.c"
 //Uncomment the next line when programming the autonomous code
 #include "AutonomousFunctionsRename.h"
 #include "Selection.h"
-#include "lcd.h"
+#include "battery.h"
 void lift(int power);
 void pre_auton(){
+	//clearLCDLine(1);
+	//clearLCDLine(2);
+	//displayLCDVoltageString(1);
+	//displayLCDCenteredString(0, "This displayed");
 }
 task autonomous(){
+	//clearLCDLine(1);
+	//clearLCDLine(2);
+	//displayLCDCenteredString(0, "Hi");
+	//displayLCDVoltageString(1);
 	/*
 	//lift for 2 seconds
 	motor[rtLift] = motor[rmLift] = motor[rlLift] = motor[ltLift] = motor[lmLift] = motor[llLift] = 127;
@@ -163,12 +171,6 @@ task usercontrol(){
 		}
 		if(vexRT[Btn7D]){
 			SensorValue[blockPneumatics] = false;
-		}
-		if(vexRT[Btn8L]){
-			SensorValue[tubePneumatics] = true;
-		}
-		if(vexRT[Btn8D]){
-			SensorValue[tubePneumatics] = false;
 		}
 	}
 }

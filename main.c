@@ -24,8 +24,8 @@ This file is the main link of the program, it has the button controls and specif
 #pragma userControlDuration(120)
 #include "Vex_Competition_Includes.c"
 //Uncomment the next line when programming the autonomous code
-#include "AutonomousFunctionsRename.h"
-#include "Selection.h"
+#include "autonomous.h"
+//#include "selection.h"
 #include "battery.h"
 void lift(int power);
 void pre_auton(){

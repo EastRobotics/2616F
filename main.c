@@ -23,22 +23,24 @@ This file is the main link of the program, it has the button controls and specif
 #pragma autonomousDuration(20)
 #pragma userControlDuration(120)
 #include "Vex_Competition_Includes.c"
-//Uncomment the next line when programming the autonomous code
-#include "autonomous.h"
+//Uncomment the next line(s) when programming the autonomous code
+//#include "autonomous.h"
 //#include "selection.h"
 #include "battery.h"
 void lift(int power);
+void clearLCD();
+void print(const char* lineOne, const char* lineTwo);
 void pre_auton(){
-	clearLCDLine(0);
-	clearLCDLine(1);
-	displayLCDVoltageString(0);
-	displayLCDCenteredString(0, "This displayed");
+	//This is dummy code to try to learn how to print to the LCD. You're free to delete it
+	//clearLCD();
+	//print("This displayed", NULL);
+	//displayLCDVoltageString(1);
 }
 task autonomous(){
-	clearLCDLine(0);
-	clearLCDLine(1);
-	displayLCDCenteredString(0, "Hi");
-	displayLCDVoltageString(1);
+	//This is dummy code to try to learn how to print to the LCD. You're free to delete it
+	//clearLCD();
+	//print("Hi", NULL);
+	//displayLCDVoltageString(1);
 	/*
 	//lift for 2 seconds
 	motor[rtLift] = motor[rmLift] = motor[rlLift] = motor[ltLift] = motor[lmLift] = motor[llLift] = 127;
@@ -156,24 +158,38 @@ task usercontrol(){
 			motor[rfDrive] = motor[rbDrive] = vexRT[Ch2];
 		}
 		//Lift
-		if(vexRT[Btn6U]){//using the lift function, this says run at full speed when 6U is pressed
+		if(vexRT[Btn6D]){//using the lift function, this says run at full speed when 6U is pressed
 			lift(127);
 		}
-		else if (vexRT[Btn6D]){//Reverse direction
+		else if (vexRT[Btn6U]){//Reverse direction
 			lift(-127);
 		}
 		else{//If neither button is pressed it won't move, it must be set to zero or it'll keep going after being pressed
 			lift(0);
 		}
 		//Pneumatics
-		if(vexRT[Btn7R]){
+		if(vexRT[Btn5U]){
 			SensorValue[blockPneumatics] = true;
 		}
-		if(vexRT[Btn7D]){
+		if(vexRT[Btn5D]){
 			SensorValue[blockPneumatics] = false;
 		}
 	}
 }
 void lift(int power){
 	motor[ltLift] = motor[lmLift] = motor[llLift] = motor[rtLift] = motor[rmLift] = motor[rlLift] = power;
+}
+void clearLCD(){
+	clearLCDLine(0);
+	clearLCDLine(1);
+}
+void print(const char* lineOne, const char* lineTwo){
+	clearLCDLine(0);
+	displayLCDPos(0, 0);
+	displayNextLCDString(lineOne);
+	if(lineTwo != NULL){
+		clearLCDLine(1);
+		displayLCDPos(1, 0);
+		displayNextLCDString(lineTwo);
+	}
 }

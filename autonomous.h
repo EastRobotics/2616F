@@ -12,7 +12,7 @@ void resetEncoders(){                        //Clears drive encoders
 /////////////////////////////////////////////////////////////////////////////////////////
 void basicDrive(int leftPower, int rightPower){
 	motor[lfDrive] = motor[lbDrive] = leftPower;
- motor[rfDrive] = motor[rbDrive] = rightPower;
+ 	motor[rfDrive] = motor[rbDrive] = rightPower;
 }
 /////////////////////////////////////////////////////////////////////////////////////////
 //**Drive**/

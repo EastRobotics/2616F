@@ -24,114 +24,128 @@ This file is the main link of the program, it has the button controls and specif
 #pragma userControlDuration(120)
 #include "Vex_Competition_Includes.c"
 //Uncomment the next line(s) when programming the autonomous code
-//#include "autonomous.h"
+#include "autonomous.h"
 //#include "selection.h"
 #include "battery.h"
 void lift(int power);
 void clearLCD();
 void print(const char* lineOne, const char* lineTwo);
+void stopDrive();
+void waitForPress();
+void waitForRelease();
+const short leftButton = 1;
+const short centerButton = 2;
+const short rightButton = 4;
+int count = 0;
 void pre_auton(){
-	//This is dummy code to try to learn how to print to the LCD. You're free to delete it
-	//clearLCD();
-	//print("This displayed", NULL);
-	//displayLCDVoltageString(1);
+	clearLCDLine(0);
+	clearLCDLine(1);
+	//Loop while center button is not pressed
+	while(nLCDButtons != centerButton)
+	{
+		//Switch case that allows the user to choose from 4 different options
+		switch(count){
+		case 0:
+			//Display first choice
+			displayLCDCenteredString(0, "Red");
+			displayLCDCenteredString(1, "<		 Enter		>");
+			waitForPress();
+			//Increment or decrement "count" based on button press
+			if(nLCDButtons == leftButton){
+				waitForRelease();
+				count = 3;
+			}
+			else if(nLCDButtons == rightButton){
+				waitForRelease();
+				count++;
+			}
+			break;
+		case 1:
+			//Display second choice
+			displayLCDCenteredString(0, "Blue");
+			displayLCDCenteredString(1, "<		 Enter		>");
+			waitForPress();
+			//Increment or decrement "count" based on button press
+			if(nLCDButtons == leftButton){
+				waitForRelease();
+				count--;
+			}
+			else if(nLCDButtons == rightButton){
+				waitForRelease();
+				count++;
+			}
+			break;
+		default:
+			count = 0;
+			break;
+		}
+	}
 }
 task autonomous(){
-	//This is dummy code to try to learn how to print to the LCD. You're free to delete it
-	//clearLCD();
-	//print("Hi", NULL);
-	//displayLCDVoltageString(1);
-	/*
-	//lift for 2 seconds
-	motor[rtLift] = motor[rmLift] = motor[rlLift] = motor[ltLift] = motor[lmLift] = motor[llLift] = 127;
-	wait1Msec(2000);
-	//drive forward for .25 of a second
-	motor[leftDriveFront]= motor[leftDriveBack] = motor[leftDriveMiddle] = motor[rightDriveBack] = motor[rightDriveFront] = motor[rightDriveMiddle] = 127;
-	wait1Msec(250);
-	//lower the lift for .5 of a second
-	motor[leftLiftTop] = motor[leftLiftBottom] = motor[rightLiftTop] = motor[rightLiftBottom] = -127;
-	wait1Msec(500);
-	//drive backward for 1 second
-	motor[leftDriveFront]= motor[leftDriveBack] = motor[leftDriveMiddle] = motor[rightDriveBack] = motor[rightDriveFront] = motor[rightDriveMiddle] = -127;
-	wait1Msec(1000);
-	//lower lift for 1.25 seconds and placing the skyrise in the holder
-	motor[leftLiftTop] = motor[leftLiftBottom] = motor[rightLiftTop] = motor[rightLiftBottom] = -127;
-	wait1Msec(1250);
-	//lifting lift and releasing the skyrise section
-	motor[leftLiftTop] = motor[leftLiftBottom] = motor[rightLiftTop] = motor[rightLiftBottom] = 127;
-	wait1Msec(500);
-	//drive forward for 1.25 seconds
-	motor[leftDriveFront]= motor[leftDriveBack] = motor[leftDriveMiddle] = motor[rightDriveBack] = motor[rightDriveFront] = motor[rightDriveMiddle] = 127;
-	wait1Msec(1250);
-	//lift the lift to get the second skyrise section
-	motor[leftLiftTop] = motor[leftLiftBottom] = motor[rightLiftTop] = motor[rightLiftBottom] = 127;
-	wait1Msec(1000);
-	//lower the lift to get the second skyrise
-	motor[leftLiftTop] = motor[leftLiftBottom] = motor[rightLiftTop] = motor[rightLiftBottom] = -127;
-	wait1Msec(750);
-	//raise the lift with the skyrise section
-	motor[leftLiftTop] = motor[leftLiftBottom] = motor[rightLiftTop] = motor[rightLiftBottom] = 127;
-	wait1Msec(1000);
-	//drive backward to the skyrise
-	motor[leftDriveFront]= motor[leftDriveBack] = motor[leftDriveMiddle] = motor[rightDriveBack] = motor[rightDriveFront] = motor[rightDriveMiddle] = -127;
-	wait1Msec(1000);
-	//lower lift for .750 second and placing the skyrise in the holder
-	motor[leftLiftTop] = motor[leftLiftBottom] = motor[rightLiftTop] = motor[rightLiftBottom] = -127;
-	wait1Msec(750);
-	//lifting lift and releasing the skyrise section
-	motor[leftLiftTop] = motor[leftLiftBottom] = motor[rightLiftTop] = motor[rightLiftBottom] = 127;
-	wait1Msec(500);
-
-
-
-
-	//	liftLift(1550);
-	//wait1Msec(300);
-	//nMotorEncoder[leftLiftBottom] = 0;
-	//	nMotorEncoder[rightLiftBottom] = 0;
-	//	SensorValue[leftLiftIEM] = 0;
-	//SensorValue[rightLifeIEM] = 0;
-
-	//////Drive forward
-
-	//encoderDrive(100, 500);
-	//wait1Msec(300);
-	//nMotorEncoder[leftDriveMiddle] = nMotorEncoder[rightDriveMiddle] = 0;
-
-	//Release cube
-	//	SensorValue[intakePneumatics] = 1;
-
-	//LowerLift
-	//lowerLift(-1000);
-	//wait1Msec(300);
-	//nMotorEncoder[leftLiftBottom] = nMotorEncoder[rightLiftBottom] = 0;
-
-	//Grab cube
-	//SensorValue[intakePneumatics] = 0;
-
-	//Turn back
-	//spin(-60, 800);
-	//nMotorEncoder[leftDriveMiddle] = nMotorEncoder[rightDriveMiddle] = 0;
-
-	//Drive forward
-	//encoderDrive(60, 500);
-	//nMotorEncoder[leftDriveMiddle] = nMotorEncoder[rightDriveMiddle] = 0;
-
-	//Lift lift
-	//liftLift(2550);
-	//wait1Msec(300);
-	//nMotorEncoder[leftLiftBottom] = nMotorEncoder[rightLiftBottom] = 0
-
-	//Release cube
-	//SensorValue[intakePneumatics] = 1;
-	*/
+		//Red Drive
+	//Switch Case that actually runs the user choice
+	switch(count){
+	case 0:
+		//If count = 0, run the code correspoinding with choice 1
+		displayLCDCenteredString(0, "Red");
+		displayLCDCenteredString(1, "is running!");
+		wait1Msec(250);
+		SensorValue[blockPneumatics] = false;
+		lift(-127);
+		wait1Msec(2500);
+		lift(0);
+		basicDrive(0, 127);
+		wait1Msec(850);
+		stopDrive();
+		SensorValue[blockPneumatics] = true;
+		lift(-127);
+		wait1Msec(500);
+		lift(0);
+		basicDrive(-70, -70);
+		wait1Msec(1000);
+		stopDrive();
+		break;
+	case 1:
+	//Blue Drive
+		//If count = 1, run the code correspoinding with choice 2
+		displayLCDCenteredString(0, "Blue");
+		displayLCDCenteredString(1, "is running!");
+		wait1Msec(250);
+		SensorValue[blockPneumatics] = false;
+		lift(-127);
+		wait1Msec(2500);
+		lift(0);
+		basicDrive(127, 0);
+		wait1Msec(850);
+		stopDrive();
+		SensorValue[blockPneumatics] = true;
+		lift(-127);
+		wait1Msec(500);
+		lift(0);
+		basicDrive(-70, -70);
+		wait1Msec(1000);
+		stopDrive();
+		break;
+	default:
+		displayLCDCenteredString(0, "No valid choice");
+		displayLCDCenteredString(1, "was made!");
+		break;
+	}
 }
 
 task usercontrol(){
 	// User control code here, inside the loop
+	clearLCD();
+	int origBattery = nImmediateBatteryLevel;
+	int origBackBattery = BackupBatteryLevel;
+	displayLCDVoltageString(0);
+	displayLCDCenteredString(0, "2616F");
 	bool leftDriveShouldStop;
 	bool rightDriveShouldStop;
 	while(true){
+		if(nImmediateBatteryLevel != origBattery || BackupBatteryLevel != origBackBattery){
+			displayLCDVoltageString(1);
+		}
 		//Bogdan Drive
 		if(abs(vexRT[Ch3]) <= 30){
 			leftDriveShouldStop = true;
@@ -192,4 +206,15 @@ void print(const char* lineOne, const char* lineTwo){
 		displayLCDPos(1, 0);
 		displayNextLCDString(lineTwo);
 	}
+}
+void stopDrive(){
+	motor[rfDrive] = motor[rbDrive] = motor[lfDrive] = motor[lbDrive] = 0;
+}
+void waitForPress(){
+	while(nLCDButtons == 0){/*We just have to wait a while*/}
+	wait1Msec(5);
+}
+void waitForRelease(){
+	while(nLCDButtons != 0){/*We just have to wait a while*/}
+	wait1Msec(5);
 }

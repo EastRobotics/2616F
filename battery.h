@@ -3,10 +3,10 @@
 void displayLCDVoltageString(int line);
 void displayVoltage(int line, int position, int millivolts, bool leftAligned);
 void displayLCDVoltageString(int line){
+	bLCDBacklight = true;
 	clearLCDLine(line);
-	int expanderBatteryLevel = (float)SensorValue[expander] * 1000 / 280;
-	displayVoltage(1, 0, nImmediateBatteryLevel, true);
-	displayVoltage(1, 11, expanderBatteryLevel, false);
+	displayVoltage(line, 0, nImmediateBatteryLevel, true);
+	displayVoltage(line, 11, BackupBatteryLevel, false);
 }
 void displayVoltage(int line, int position, int millivolts, bool leftAligned){
 	displayLCDPos(line, position);

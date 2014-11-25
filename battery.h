@@ -5,8 +5,9 @@ void displayVoltage(int line, int position, int millivolts, bool leftAligned);
 void displayLCDVoltageString(int line){
 	bLCDBacklight = true;
 	clearLCDLine(line);
-	displayVoltage(line, 0, nImmediateBatteryLevel, true);
-	displayVoltage(line, 11, BackupBatteryLevel, false);
+	int otherBatteryLevel = (float)SensorValue[otherBattery] * 1000 / 280;
+	displayVoltage(1, 0, nImmediateBatteryLevel, true);
+	displayVoltage(1, 11, otherBatteryLevel, false);
 }
 void displayVoltage(int line, int position, int millivolts, bool leftAligned){
 	displayLCDPos(line, position);

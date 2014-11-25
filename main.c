@@ -1,4 +1,4 @@
-#pragma config(Sensor, dgtl11, expander,       sensorDigitalIn)
+#pragma config(Sensor, in1,    otherBattery,   sensorAnalog)
 #pragma config(Sensor, dgtl12, blockPneumatics, sensorDigitalOut)
 #pragma config(Motor,  port1,           rtLift,        tmotorVex393_HBridge, openLoop)
 #pragma config(Motor,  port2,           lfDrive,       tmotorVex393_MC29, openLoop)
@@ -137,13 +137,13 @@ task usercontrol(){
 	// User control code here, inside the loop
 	clearLCD();
 	int origBattery = nImmediateBatteryLevel;
-	int origBackBattery = BackupBatteryLevel;
+	int origBackBattery = SensorValue[otherBattery];
 	displayLCDVoltageString(0);
 	displayLCDCenteredString(0, "2616F");
 	bool leftDriveShouldStop;
 	bool rightDriveShouldStop;
 	while(true){
-		if(nImmediateBatteryLevel != origBattery || BackupBatteryLevel != origBackBattery){
+		if(nImmediateBatteryLevel != origBattery || SensorValue[otherBattery] != origBackBattery){
 			displayLCDVoltageString(1);
 		}
 		//Bogdan Drive

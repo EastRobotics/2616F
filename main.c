@@ -23,6 +23,7 @@ This file is the main link of the program, it has the button controls and specif
 #pragma autonomousDuration(20)
 #pragma userControlDuration(120)
 #include "Vex_Competition_Includes.c"
+#include "enumerations.h"
 //Uncomment the next line(s) when programming the autonomous code
 #include "autonomous.h"
 //#include "selection.h"
@@ -82,7 +83,7 @@ void pre_auton(){
 	}
 }
 task autonomous(){
-		//Red Drive
+	//Red Drive
 	//Switch Case that actually runs the user choice
 	switch(count){
 	case 0:
@@ -106,7 +107,7 @@ task autonomous(){
 		stopDrive();
 		break;
 	case 1:
-	//Blue Drive
+		//Blue Drive
 		//If count = 1, run the code correspoinding with choice 2
 		displayLCDCenteredString(0, "Blue");
 		displayLCDCenteredString(1, "is running!");

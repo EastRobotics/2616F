@@ -26,24 +26,22 @@ This file is the main link of the program, it has the button controls and specif
 #include "enumerations.h"
 //Uncomment the next line(s) when programming the autonomous code
 #include "autonomous.h"
-//#include "selection.h"
-#include "battery.h"
+#include "lcd.c"
+#include "battery.c"
 void lift(int power);
 void clearLCD();
 void print(const char* lineOne, const char* lineTwo);
 void stopDrive();
 void waitForPress();
 void waitForRelease();
-const short leftButton = 1;
-const short centerButton = 2;
-const short rightButton = 4;
+MHAutonMode selection;
 int count = 0;
 void pre_auton(){
 	clearLCDLine(0);
 	clearLCDLine(1);
 	//Loop while center button is not pressed
-	while(nLCDButtons != centerButton)
-	{
+	bool selected = false;
+	while(!selected){
 		//Switch case that allows the user to choose from 4 different options
 		switch(count){
 		case 0:
@@ -52,11 +50,11 @@ void pre_auton(){
 			displayLCDCenteredString(1, "<		 Enter		>");
 			waitForPress();
 			//Increment or decrement "count" based on button press
-			if(nLCDButtons == leftButton){
+			if(nLCDButtons == MHLCDButtonLeft){
 				waitForRelease();
 				count = 3;
 			}
-			else if(nLCDButtons == rightButton){
+			else if(nLCDButtons == MHLCDButtonRight){
 				waitForRelease();
 				count++;
 			}
@@ -67,11 +65,11 @@ void pre_auton(){
 			displayLCDCenteredString(1, "<		 Enter		>");
 			waitForPress();
 			//Increment or decrement "count" based on button press
-			if(nLCDButtons == leftButton){
+			if(nLCDButtons == MHLCDButtonLeft){
 				waitForRelease();
 				count--;
 			}
-			else if(nLCDButtons == rightButton){
+			else if(nLCDButtons == MHLCDButtonRight){
 				waitForRelease();
 				count++;
 			}
@@ -139,7 +137,7 @@ task usercontrol(){
 	clearLCD();
 	int origBattery = nImmediateBatteryLevel;
 	int origBackBattery = SensorValue[otherBattery];
-	displayLCDVoltageString(0);
+	displayLCDVoltageString(1);
 	displayLCDCenteredString(0, "2616F");
 	bool leftDriveShouldStop;
 	bool rightDriveShouldStop;
@@ -209,7 +207,7 @@ void print(const char* lineOne, const char* lineTwo){
 	}
 }
 void stopDrive(){
-	motor[rfDrive] = motor[rbDrive] = motor[lfDrive] = motor[lbDrive] = 0;
+	motor[rfDrive] = motor[rbDrive] = motor[lfDrive] = motor[lbDrive] = MHMotorPowerStop;
 }
 void waitForPress(){
 	while(nLCDButtons == 0){/*We just have to wait a while*/}

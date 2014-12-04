@@ -51,7 +51,7 @@ void displayNextScreen();
 //If it has a configuration, this makes the screen stroed in lastScreen go live on the VEX LCD
 void displayLastScreen();
 //This edits a string that is passed so that it will be centered within a given space. If no area is given, it will be centered to the VEX LCD
-void centerString(string *original, int area);
+//void centerString(string *original, int area);
 //Prepares a MHLCDScreen for display by the displayScreen function
 void prepareScreen(MHLCDScreen *screen);
 //Clears the LCD screen when necessary
@@ -68,6 +68,7 @@ void waitForRelease();
 void flashScreen(MHLCDScreen screen);
 //Displays a screen style for 5 seconds, then switches back to the previous
 void flashScreenStyle(MHLCDScreenStyle screenStyle);
+/*
 void centerString(string *original, int area){
 	if(area == MHStringPaddingLCDCenter){
 		area = MHLCDScreenWidth;
@@ -78,16 +79,16 @@ void centerString(string *original, int area){
 			whitespace += " ";
 	}
 	if(space % 2 == 0){
-		//This has to be split into 2 lines, because ROBOTC is stupid
-		*original = whitespace + *original;
-		*original += whitespace;
+		//*original = whitespace + *original;
+		sprintf(*original, "%s%s", whitespace, *original);
 	}
 	else{
-		//Also has to be split into 2 lines, also because ROBOTC is stupid
 		*original = whitespace + *original;
-		*original += whitespace + " ";
+		sprintf(*original, "%s%s", whitespace, *original);
 	}
 }
+
+*/
 void screenForScreenStyle(MHLCDScreenStyle style, MHLCDScreen *screen){
 	if(!*screen){
 		*screen = nextScreen;
@@ -101,23 +102,18 @@ void screenForScreenStyle(MHLCDScreenStyle style, MHLCDScreen *screen){
 			screen->lastScreenStyle = MHLCDScreenStyleMain;
 			screen->nextScreenStyle = MHLCDScreenStylePointSelection;
 			screen->backlight = true;
-			header = "2616F";
-			screen->header = header;
-			centerString(&header, MHStringPaddingLCDCenter);
+			screen->header = "2616F";
 			screen->topLine = header;
-			screen->rightOption = "Red";
+			screen->rightOption = "Blue";
 			screen->middleOption = "None";
-			screen->leftOption = "Blue";
-			screen->bottomLine = "Red   None  Blue";
+			screen->leftOption = "Red";
 			screen->footer = screen->bottomLine;
 			break;
 		case MHLCDScreenStylePointSelection:
 			screen->style = MHLCDScreenStylePointSelection;
 			screen->lastScreenStyle = MHLCDScreenStyleMain;
 			screen->backlight = true;
-			header = "Points";
-			screen->header = header;
-			centerString(&header, MHStringPaddingLCDCenter);
+			screen->header = "Points";
 			screen->topLine = header;
 			screen->leftOption = "3";
 			screen->middleOption = "Back";
@@ -130,9 +126,7 @@ void screenForScreenStyle(MHLCDScreenStyle style, MHLCDScreen *screen){
 			screen->lastScreenStyle = MHLCDScreenStylePointSelection;
 			screen->nextScreenStyle = MHLCDScreenStyleOff;
 			screen->backlight = false;
-			header = "2616F";
-			screen->header = header;
-			centerString(&header, MHStringPaddingLCDCenter);
+			screen->header = "2616F";
 			screen->topLine = header;
 			LCDVoltageLine(&footer);
 			screen->footer = footer;
@@ -175,8 +169,8 @@ void displayScreen(MHLCDScreen screen){
 	clearLCD();
 	lastScreen = liveScreen;
 	bLCDBacklight = screen.backlight;
-	displayLCDString(0, 0, screen.topLine);
-	displayLCDString(1, 0, screen.bottomLine);
+	displayLCDCenteredString(0, screen.topLine);
+	displayLCDCenteredString(1, screen.bottomLine);
 	liveScreen = screen;
 	screenForScreenStyle(screen.nextScreenStyle, &nextScreen);
 }
@@ -209,22 +203,19 @@ void prepareScreen(MHLCDScreen *screen){
 		screen->style = MHLCDScreenStyleCustom;
 	}
 	if(screen->header != ""){
-		centerString(screen->header, MHStringPaddingLCDCenter);
 		screen->topLine = screen->header;
 	}
 	if(screen->footer != ""){
-		centerString(screen->footer, MHStringPaddingLCDCenter);
 		screen->bottomLine = screen->footer;
 	}
 	if(screen->rightOption != "" || screen->middleOption != "" || screen->leftOption != ""){
 		if(strlen(screen->rightOption) + strlen(screen->middleOption) + strlen(screen->leftOption) <= 16){
 			int space = MHLCDScreenWidth - strlen(screen->rightOption) + strlen(screen->leftOption);
-			centerString(screen->middleOption, space);
+			//centerString(screen->middleOption, space);
 			sprintf(screen->bottomLine, "%s%s%s", screen->leftOption, screen->middleOption, screen->rightOption);
 		}
 		else{
 			screen->bottomLine = "Too many chars";
-			centerString(screen->bottomLine, MHStringPaddingLCDCenter);
 		}
 	}
 }

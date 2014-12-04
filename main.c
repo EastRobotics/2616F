@@ -77,82 +77,109 @@ void pre_auton(){
 		}
 	}
 	*/
+	string current = "main";
 	screenForScreenStyle(MHLCDScreenStyleMain, &liveScreen);
 	displayScreen(liveScreen);
 	//Everything needs to be stuffed in a loop, just to allow graceful back functionality without causing a stackoverflow
 	while(selection == MHAutonModeNoneSelected){
 		//I'm not sure if the break and continue procs will apply to a nested switch statement, so until I find out, I'm using ifs
-		if(liveScreen.style == MHLCDScreenStyleMain){
+		if(current == "main"){
 			waitForPress();
 			if(nLCDButtons == MHLCDButtonLeft){
 				//Display the Point Selection screen, keep track of the color (red), restart the loop
+				waitForRelease();
 				color = MHTeamColorRed;
 				screenForScreenStyle(MHLCDScreenStylePointSelection, &nextScreen);
 				displayNextScreen();
+				current = "point";
 				continue;
 			}
 			else if(nLCDButtons == MHLCDButtonCenter){
 				//End the loop, specify no auton, go to voltage screen
+				waitForRelease();
 				color = MHTeamColorAny;
 				selection = MHAutonModeNoAuton;
 				screenForScreenStyle(MHLCDScreenStyleVoltage, &nextScreen);
 				displayNextScreen();
+				current = "volt";
 				break;
 			}
 			else if(nLCDButtons == MHLCDButtonRight){
 				//Display the Point Selection screen, keep track of the color (blue), restart the loop
-			color = MHTeamColorBlue;
-			screenForScreenStyle(MHLCDScreenStylePointSelection, &nextScreen);
-			displayNextScreen();
-			continue;
-			}
-			else if(nLCDButtons == MHLCDButtonAll){
-				//Display the voltage screen for 5 seconds, reinstate the main screen, restart the loop
-				flashScreenStyle(MHLCDScreenStyleVoltage);
+				waitForRelease();
+				color = MHTeamColorBlue;
+				screenForScreenStyle(MHLCDScreenStylePointSelection, &nextScreen);
+				displayNextScreen();
+				current = "point";
 				continue;
 			}
+			/*else if(nLCDButtons == MHLCDButtonAll){
+				//Display the voltage screen for 5 seconds, reinstate the main screen, restart the loop
+				waitForRelease();
+				flashScreenStyle(MHLCDScreenStyleVoltage);
+				continue;
+			}*/
+			else{
+				waitForRelease();
+				print("Invalid", "selection");
+				wait1Msec(MHTimeOneSecond * 2);
+				displayScreen(liveScreen);
+			}
 		}
-		else if(liveScreen.style == MHLCDScreenStylePointSelection){
+		else if(current == "point"){
 			waitForPress();
 			if(nLCDButtons == MHLCDButtonLeft){
 				//Set the proper 3 point auton, display voltage screen, end the loop
+				waitForRelease();
 				if(color == MHTeamColorBlue){
 					selection = MHAutonModeBlue3;
 					screenForScreenStyle(MHLCDScreenStyleVoltage, &nextScreen);
 					displayNextScreen();
+					current = "volt";
 					break;
 				}
 				else if(color == MHTeamColorRed){
 					selection = MHAutonModeRed3;
 					screenForScreenStyle(MHLCDScreenStyleVoltage, &nextScreen);
 					displayNextScreen();
+					current = "volt";
 					break;
 				}
 			}
 			else if(nLCDButtons == MHLCDButtonCenter){
 				//Clear the team color selection, go back to the main screen, restart the loop
+				waitForRelease();
 				color = MHTeamColorNone;
 				displayLastScreen();
+				current = "main";
 				continue;
 			}
 			else if(nLCDButtons == MHLCDButtonRight){
 				//Set the proper 5 point auton, display the voltage screen, end the loop
+				waitForRelease();
 				if(color == MHTeamColorBlue){
 					selection = MHAutonModeBlue5;
 					screenForScreenStyle(MHLCDScreenStyleVoltage, &nextScreen);
 					displayNextScreen();
+					current = "volt";
 					break;
 				}
 				else if(color == MHTeamColorRed){
 					selection = MHAutonModeRed5;
 					screenForScreenStyle(MHLCDScreenStyleVoltage, &nextScreen);
 					displayNextScreen();
+					current = "volt";
 				}
 			}
-			else if(nLCDButtons == MHLCDButtonAll){
+			/*else if(nLCDButtons == MHLCDButtonAll){
 				//Display the voltage screen for 5 seconds, reinstate the Point Selection screen, restart the loop
+				waitForRelease();
 				flashScreenStyle(MHLCDScreenStyleVoltage);
 				continue;
+			}*/
+			else{
+				waitForRelease();
+				print("Invalid", "Point");
 			}
 		}
 	}
@@ -210,6 +237,15 @@ task autonomous(){
 		break;
 	}
 	*/
+
+
+
+
+
+
+
+
+
 	switch(selection){
 		case MHAutonModeNoAuton:
 			//Since there's no autonomous, we can wait for the usercontrol;

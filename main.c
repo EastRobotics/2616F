@@ -26,15 +26,11 @@ This file is the main link of the program, it has the button controls and specif
 #include "enumerations.h"
 //Uncomment the next line(s) when programming the autonomous code
 #include "autonomous.h"
-#include "lcd.c"
-#include "battery.c"
+#include "lcd.h"
 void lift(int power);
-void clearLCD();
-void print(const char* lineOne, const char* lineTwo);
 void stopDrive();
 void waitForPress();
 void waitForRelease();
-MHAutonMode selection;
 int count = 0;
 void pre_auton(){
 	clearLCDLine(0);
@@ -137,13 +133,13 @@ task usercontrol(){
 	clearLCD();
 	int origBattery = nImmediateBatteryLevel;
 	int origBackBattery = SensorValue[otherBattery];
-	displayLCDVoltageString(1);
+	//displayLCDVoltageString(1);
 	displayLCDCenteredString(0, "2616F");
 	bool leftDriveShouldStop;
 	bool rightDriveShouldStop;
 	while(true){
 		if(nImmediateBatteryLevel != origBattery || SensorValue[otherBattery] != origBackBattery){
-			displayLCDVoltageString(1);
+			//displayLCDVoltageString(1);
 		}
 		//Bogdan Drive
 		if(abs(vexRT[Ch3]) <= 30){
@@ -191,20 +187,6 @@ task usercontrol(){
 }
 void lift(int power){
 	motor[ltLift] = motor[lmLift] = motor[llLift] = motor[rtLift] = motor[rmLift] = motor[rlLift] = power;
-}
-void clearLCD(){
-	clearLCDLine(0);
-	clearLCDLine(1);
-}
-void print(const char* lineOne, const char* lineTwo){
-	clearLCDLine(0);
-	displayLCDPos(0, 0);
-	displayNextLCDString(lineOne);
-	if(lineTwo != NULL){
-		clearLCDLine(1);
-		displayLCDPos(1, 0);
-		displayNextLCDString(lineTwo);
-	}
 }
 void stopDrive(){
 	motor[rfDrive] = motor[rbDrive] = motor[lfDrive] = motor[lbDrive] = MHMotorPowerStop;

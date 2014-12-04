@@ -40,3 +40,13 @@ typedef enum{
 	MHTimeHalfSecond = 500,
 	MHTimeOneSecond = 1000
 }MHTime;
+//Map of the possible LCD button combinations to make them easy to reference
+typedef enum{
+	MHLCDButtonLeft = 1,
+	MHLCDButtonCenter = 2,
+	MHLCDButtonRight = 4,
+	MHLCDButtonLeftCenter = 3,
+	MHLCDButtonLeftRight = 5,
+	MHLCDButtonCenterRight = 6,
+	MHLCDButtonAll = 7
+}MHLCDButton;

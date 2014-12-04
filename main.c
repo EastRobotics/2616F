@@ -29,10 +29,11 @@ This file is the main link of the program, it has the button controls and specif
 #include "lcd.h"
 void lift(int power);
 void stopDrive();
-void waitForPress();
-void waitForRelease();
-int count = 0;
+MHAutonMode selection = MHAutonModeNoneSelected;
+MHTeamColor color = MHTeamColorNone;
 void pre_auton(){
+	//Up here is the old pre_auton. This is here incase the new one using my lcd.h doesn't work out in time
+	/*
 	clearLCDLine(0);
 	clearLCDLine(1);
 	//Loop while center button is not pressed
@@ -75,11 +76,93 @@ void pre_auton(){
 			break;
 		}
 	}
+	*/
+	screenForScreenStyle(MHLCDScreenStyleMain, &liveScreen);
+	displayScreen(liveScreen);
+	//Everything needs to be stuffed in a loop, just to allow graceful back functionality without causing a stackoverflow
+	while(selection == MHAutonModeNoneSelected){
+		//I'm not sure if the break and continue procs will apply to a nested switch statement, so until I find out, I'm using ifs
+		if(liveScreen.style == MHLCDScreenStyleMain){
+			waitForPress();
+			if(nLCDButtons == MHLCDButtonLeft){
+				//Display the Point Selection screen, keep track of the color (red), restart the loop
+				color = MHTeamColorRed;
+				screenForScreenStyle(MHLCDScreenStylePointSelection, &nextScreen);
+				displayNextScreen();
+				continue;
+			}
+			else if(nLCDButtons == MHLCDButtonCenter){
+				//End the loop, specify no auton, go to voltage screen
+				color = MHTeamColorAny;
+				selection = MHAutonModeNoAuton;
+				screenForScreenStyle(MHLCDScreenStyleVoltage, &nextScreen);
+				displayNextScreen();
+				break;
+			}
+			else if(nLCDButtons == MHLCDButtonRight){
+				//Display the Point Selection screen, keep track of the color (blue), restart the loop
+			color = MHTeamColorBlue;
+			screenForScreenStyle(MHLCDScreenStylePointSelection, &nextScreen);
+			displayNextScreen();
+			continue;
+			}
+			else if(nLCDButtons == MHLCDButtonAll){
+				//Display the voltage screen for 5 seconds, reinstate the main screen, restart the loop
+				flashScreenStyle(MHLCDScreenStyleVoltage);
+				continue;
+			}
+		}
+		else if(liveScreen.style == MHLCDScreenStylePointSelection){
+			waitForPress();
+			if(nLCDButtons == MHLCDButtonLeft){
+				//Set the proper 3 point auton, display voltage screen, end the loop
+				if(color == MHTeamColorBlue){
+					selection = MHAutonModeBlue3;
+					screenForScreenStyle(MHLCDScreenStyleVoltage, &nextScreen);
+					displayNextScreen();
+					break;
+				}
+				else if(color == MHTeamColorRed){
+					selection = MHAutonModeRed3;
+					screenForScreenStyle(MHLCDScreenStyleVoltage, &nextScreen);
+					displayNextScreen();
+					break;
+				}
+			}
+			else if(nLCDButtons == MHLCDButtonCenter){
+				//Clear the team color selection, go back to the main screen, restart the loop
+				color = MHTeamColorNone;
+				displayLastScreen();
+				continue;
+			}
+			else if(nLCDButtons == MHLCDButtonRight){
+				//Set the proper 5 point auton, display the voltage screen, end the loop
+				if(color == MHTeamColorBlue){
+					selection = MHAutonModeBlue5;
+					screenForScreenStyle(MHLCDScreenStyleVoltage, &nextScreen);
+					displayNextScreen();
+					break;
+				}
+				else if(color == MHTeamColorRed){
+					selection = MHAutonModeRed5;
+					screenForScreenStyle(MHLCDScreenStyleVoltage, &nextScreen);
+					displayNextScreen();
+				}
+			}
+			else if(nLCDButtons == MHLCDButtonAll){
+				//Display the voltage screen for 5 seconds, reinstate the Point Selection screen, restart the loop
+				flashScreenStyle(MHLCDScreenStyleVoltage);
+				continue;
+			}
+		}
+	}
 }
 task autonomous(){
+//All the green you see beyond this point is the old autonomous. Keep this and the old pre_auton, and you're safe for an untested competition
+/*
 	//Red Drive
 	//Switch Case that actually runs the user choice
-	switch(count){
+	switch(selection){
 	case 0:
 		//If count = 0, run the code correspoinding with choice 1
 		displayLCDCenteredString(0, "Red");
@@ -126,14 +209,67 @@ task autonomous(){
 		displayLCDCenteredString(1, "was made!");
 		break;
 	}
+	*/
+	switch(selection){
+		case MHAutonModeNoAuton:
+			//Since there's no autonomous, we can wait for the usercontrol;
+			return;
+		case MHAutonModeRed3:
+			//Here's the tried and true red 3 pointer
+			SensorValue[blockPneumatics] = false;
+			lift(-127);
+			wait1Msec(2500);
+			lift(0);
+			basicDrive(0, 127);
+			wait1Msec(850);
+			stopDrive();
+			SensorValue[blockPneumatics] = true;
+			lift(-127);
+			wait1Msec(500);
+			lift(0);
+			basicDrive(-70, -70);
+			wait1Msec(1000);
+			stopDrive();
+			//Auton over
+			return;
+		case MHAutonModeBlue3:
+			//Here's the battle-tested blue 3 pointer
+			SensorValue[blockPneumatics] = false;
+			lift(-127);
+			wait1Msec(2500);
+			lift(0);
+			basicDrive(127, 0);
+			wait1Msec(850);
+			stopDrive();
+			SensorValue[blockPneumatics] = true;
+			lift(-127);
+			wait1Msec(500);
+			lift(0);
+			basicDrive(-70, -70);
+			wait1Msec(1000);
+			stopDrive();
+			//Auton over
+			return;
+		case MHAutonModeBlue5:
+			//The 5 point blue auton mode will go here when it's written
+			print("Blue 5 Point", "Coming Soon");
+			wait1Msec(MHTimeOneSecond * 5);
+			//Auton over
+			return;
+		case MHAutonModeRed5:
+			//The 5 point red auton will go here when it's written
+			print("Red 5 Point", "Coming Soon");
+			wait1Msec(MHTimeOneSecond * 5);
+			//Auton over
+			return;
+	}
 }
-
 task usercontrol(){
 	// User control code here, inside the loop
 	clearLCD();
 	int origBattery = nImmediateBatteryLevel;
 	int origBackBattery = SensorValue[otherBattery];
-	//displayLCDVoltageString(1);
+	displayLCDVoltageString(1);
 	displayLCDCenteredString(0, "2616F");
 	bool leftDriveShouldStop;
 	bool rightDriveShouldStop;
@@ -190,12 +326,4 @@ void lift(int power){
 }
 void stopDrive(){
 	motor[rfDrive] = motor[rbDrive] = motor[lfDrive] = motor[lbDrive] = MHMotorPowerStop;
-}
-void waitForPress(){
-	while(nLCDButtons == 0){/*We just have to wait a while*/}
-	wait1Msec(5);
-}
-void waitForRelease(){
-	while(nLCDButtons != 0){/*We just have to wait a while*/}
-	wait1Msec(5);
 }

@@ -11,10 +11,10 @@ typedef enum{
 }MHMotorPower;
 //The team color that the robot is on in a particualr match. Chosen in the pre_auton function
 typedef enum{
-	MHTeamColorRed,
-	MHTeamColorBlue,
 	MHTeamColorNone,
-	MHTeamColorAny
+	MHTeamColorAny,
+	MHTeamColorRed,
+	MHTeamColorBlue
 }MHTeamColor;
 //All the possible point values that the robot can score during the autonomous task. Chosen in the pre_auton function
 typedef enum{
@@ -30,7 +30,8 @@ typedef enum{
 	MHAutonModeRed3 = MHTeamColorRed * MHAutonPointValue3,
 	MHAutonModeRed5 = MHTeamColorRed * MHAutonPointValue5,
 	//MHAutonModeNoAuton is bridged toll-free to MHAutonValueNone, because they're the same thing
-	MHAutonModeNoAuton = MHAutonPointValueNone
+	MHAutonModeNoAuton = MHAutonPointValueNone,
+	MHAutonModeNoneSelected
 }MHAutonMode;
 //typedef to frequently used amounts of time
 typedef enum{
@@ -40,13 +41,3 @@ typedef enum{
 	MHTimeHalfSecond = 500,
 	MHTimeOneSecond = 1000
 }MHTime;
-//Map of the possible LCD button combinations to make them easy to reference
-typedef enum{
-	MHLCDButtonLeft = 1,
-	MHLCDButtonCenter = 2,
-	MHLCDButtonRight = 4,
-	MHLCDButtonLeftCenter = 3,
-	MHLCDButtonLeftRight = 5,
-	MHLCDButtonCenterRight = 6,
-	MHLCDButtonAll = 7
-}MHLCDButton;

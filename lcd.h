@@ -1,9 +1,9 @@
 #pragma systemFile
 //ROBOTC Default Values: string = "", numbers = 536885932
-//Different default screen types, used by the displayScreen function in lcd.h to display a preconfigured screen
 #ifndef VOLTAGE_THRESHOLD
 #include "battery.h"
 #endif
+//Different default screen types, used by the displayScreen function in lcd.h to display a preconfigured screen
 typedef enum{
 	MHLCDScreenStyleMain,
 	MHLCDScreenStylePointSelection,
@@ -11,6 +11,17 @@ typedef enum{
 	MHLCDScreenStyleOff,
 	MHLCDScreenStyleCustom
 }MHLCDScreenStyle;
+//Map of the possible LCD button combinations to make them easy to reference
+typedef enum{
+	MHLCDButtonLeft = 1,
+	MHLCDButtonCenter = 2,
+	MHLCDButtonRight = 4,
+	MHLCDButtonLeftCenter = 3,
+	MHLCDButtonLeftRight = 5,
+	MHLCDButtonCenterRight = 6,
+	MHLCDButtonAll = 7,
+	MHLCDButtonNone = 0
+}MHLCDButton;
 //Constant to denote a string to be centered to the LCD width in the centerString function
 static const int MHStringPaddingLCDCenter = 0;
 //At the time of this writing (December 3, 2014), the standard VEX LCD width is 16 charachters. This is a constant to make that more obvious. If that ever changes, this constant will have to, too
@@ -46,7 +57,17 @@ void prepareScreen(MHLCDScreen *screen);
 //Clears the LCD screen when necessary
 void clearLCD();
 //Prints a string to the first line of the LCD, and the second line, if a string for that line is specified
-void print(string lineOne, string lineTwo);
+void print(const string lineOne, const string lineTwo);
+//Checks to see if the buttons pressed are different from the ones passed in
+bool otherButtonsPressed(MHLCDButton button);
+//Halts program execution until a button is pressed on the VEX LCD, then waits an extra tenth of a second
+void waitForPress();
+//Halts program execution until all buttons on the VEX LCD are released
+void waitForRelease();
+//Displays a screen for 5 seconds, then switches back to the previous
+void flashScreen(MHLCDScreen screen);
+//Displays a screen style for 5 seconds, then switches back to the previous
+void flashScreenStyle(MHLCDScreenStyle screenStyle);
 void centerString(string *original, int area){
 	if(area == MHStringPaddingLCDCenter){
 		area = MHLCDScreenWidth;
@@ -207,7 +228,7 @@ void prepareScreen(MHLCDScreen *screen){
 		}
 	}
 }
-void print(string lineOne, string lineTwo){
+void print(const string lineOne, const string lineTwo){
 	clearLCDLine(0);
 	displayLCDPos(0, 0);
 	displayNextLCDString(lineOne);
@@ -216,4 +237,29 @@ void print(string lineOne, string lineTwo){
 		displayLCDPos(1, 0);
 		displayNextLCDString(lineTwo);
 	}
+}
+bool otherButtonsPressed(MHLCDButton button){
+	if(nLCDButtons == button){
+		return false;
+	}
+	else{
+		return true;
+	}
+}
+void waitForPress(){
+	while(nLCDButtons == MHLCDButtonNone){/*We just have to wait a while*/}
+	wait1Msec(MHTimeTenthSecond);
+}
+void waitForRelease(){
+	while(nLCDButtons != MHLCDButtonNone){/*We just have to wait a while*/}
+}
+void flashScreen(MHLCDScreen screen){
+	displayScreen(screen);
+	wait1Msec(MHTimeOneSecond * 5);
+	displayLastScreen();
+}
+void flashScreenStyle(MHLCDScreenStyle screenStyle){
+	MHLCDScreen newScreen;
+	screenForScreenStyle(screenStyle, &newScreen);
+	flashScreen(newScreen);
 }

@@ -287,15 +287,89 @@ task autonomous(){
 			//Auton over
 			return;
 		case MHAutonModeBlue5:
-			//The 5 point blue auton mode will go here when it's written
+			//The 5 point blue auton
 			print("Blue 5 Point", "Coming Soon");
-			wait1Msec(MHTimeOneSecond * 5);
+			SensorValue[blockPneumatics] = false;
+			lift(-127);
+			wait1Msec(MHTimeHalfSecond);
+			basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+			wait1Msec(MHTimeOneSecond);
+			stopDrive();
+			lift(MHMotorPowerStop);
+			wait1Msec(MHTimeOneMillisecond * 5);
+			lift(MHMotorPowerMax);
+			wait1Msec(MHTimeOneSecond + MHTimeTenthSecond * 1.5);
+			lift(MHMotorPowerStop);
+			wait1Msec(MHTimeOneMillisecond * 5);
+			lift(-127);
+			wait1Msec(MHTimeOneSecond * 5 + MHTimeHalfSecond);
+			lift(MHMotorPowerStop);
+			basicDrive(MHMotorPowerHalf, MHMotorPowerHalf);
+			wait1Msec(MHTimeHalfSecond);
+			stopDrive();
+			wait1Msec(MHTimeOneMillisecond * 5);
+			basicDrive(-MHMotorPowerHalf, MHMotorPowerHalf);
+			wait1Msec(MHTimeOneSecond - MHTimeTenthSecond);
+			stopDrive();
+			wait1Msec(MHTimeOneMillisecond * 5);
+			basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+			wait1Msec(MHTimeTenthSecond * 3);
+			stopDrive();
+			lift(MHMotorPowerMax);
+			wait1Msec(MHTimeTenthSecond);
+			lift(MHMotorPowerStop);
+			wait1Msec(MHTimeHalfSecond);
+			SensorValue[blockPneumatics] = true;
+			wait1Msec(MHTimeOneSecond);
+			basicDrive(-MHMotorPowerMax, -MHMotorPowerMax);
+			lift(MHMotorPowerMax);
+			wait1Msec(MHTimeHalfSecond);
+			stopDrive();
+			wait1Msec(MHTimeOneSecond * 3.5);
+			lift(MHMotorPowerStop);
 			//Auton over
 			return;
 		case MHAutonModeRed5:
 			//The 5 point red auton will go here when it's written
 			print("Red 5 Point", "Coming Soon");
-			wait1Msec(MHTimeOneSecond * 5);
+			SensorValue[blockPneumatics] = false;
+			lift(-127);
+			wait1Msec(MHTimeHalfSecond);
+			basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+			wait1Msec(MHTimeOneSecond);
+			stopDrive();
+			lift(MHMotorPowerStop);
+			wait1Msec(MHTimeOneMillisecond * 5);
+			lift(MHMotorPowerMax);
+			wait1Msec(MHTimeOneSecond + MHTimeTenthSecond * 1.5);
+			lift(MHMotorPowerStop);
+			wait1Msec(MHTimeOneMillisecond * 5);
+			lift(-127);
+			wait1Msec(MHTimeOneSecond * 5 + MHTimeHalfSecond);
+			lift(MHMotorPowerStop);
+			basicDrive(MHMotorPowerHalf, MHMotorPowerHalf);
+			wait1Msec(MHTimeHalfSecond);
+			stopDrive();
+			wait1Msec(MHTimeOneMillisecond * 5);
+			basicDrive(MHMotorPowerHalf, -MHMotorPowerHalf);
+			wait1Msec(MHTimeOneSecond - MHTimeTenthSecond);
+			stopDrive();
+			wait1Msec(MHTimeOneMillisecond * 5);
+			basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+			wait1Msec(MHTimeTenthSecond * 3);
+			stopDrive();
+			lift(MHMotorPowerMax);
+			wait1Msec(MHTimeTenthSecond);
+			lift(MHMotorPowerStop);
+			wait1Msec(MHTimeHalfSecond);
+			SensorValue[blockPneumatics] = true;
+			wait1Msec(MHTimeOneSecond);
+			basicDrive(-MHMotorPowerMax, -MHMotorPowerMax);
+			lift(MHMotorPowerMax);
+			wait1Msec(MHTimeHalfSecond);
+			stopDrive();
+			wait1Msec(MHTimeOneSecond * 3.5);
+			lift(MHMotorPowerStop);
 			//Auton over
 			return;
 	}

@@ -5,11 +5,11 @@
 #endif
 //Different default screen types, used by the displayScreen function in lcd.h to display a preconfigured screen
 typedef enum{
-	MHLCDScreenStyleMain,
-	MHLCDScreenStylePointSelection,
-	MHLCDScreenStyleVoltage,
-	MHLCDScreenStyleOff,
-	MHLCDScreenStyleCustom
+	MHLCDScreenStyleMain = 1,
+	MHLCDScreenStylePointSelection = 2,
+	MHLCDScreenStyleVoltage = 3,
+	MHLCDScreenStyleOff = 0,
+	MHLCDScreenStyleCustom = 4
 }MHLCDScreenStyle;
 //Map of the possible LCD button combinations to make them easy to reference
 typedef enum{
@@ -46,6 +46,8 @@ MHLCDScreen liveScreen;
 void screenForScreenStyle(MHLCDScreenStyle style, MHLCDScreen *screen);
 //This makes the passed screen go live on the VEX LCD. If both a header and a topLine is set, then the header will display. Same for the footer - bottomLine relationship
 void displayScreen(MHLCDScreen screen);
+//Displays a screen basec on a specified screen style
+void displayScreenStyle(MHLCDScreenStyle style);
 //If it has a configuration, this makes the screen stored in nextScreen go live on the VEX LCD
 void displayNextScreen();
 //If it has a configuration, this makes the screen stroed in lastScreen go live on the VEX LCD
@@ -70,21 +72,20 @@ void flashScreen(MHLCDScreen screen);
 void flashScreenStyle(MHLCDScreenStyle screenStyle);
 /*
 void centerString(string *original, int area){
+	string text = (string)*original;
 	if(area == MHStringPaddingLCDCenter){
 		area = MHLCDScreenWidth;
 	}
-	int space = area - strlen(*original);
+	int space = area - strlen(text);
 	string whitespace = "";
 	for(int i = 0; i < floor(space / 2); i++){
 			whitespace += " ";
 	}
 	if(space % 2 == 0){
-		//*original = whitespace + *original;
-		sprintf(*original, "%s%s", whitespace, *original);
+		sprintf(*original, "%s%s%s", whitespace, text, whitespace);
 	}
 	else{
-		*original = whitespace + *original;
-		sprintf(*original, "%s%s", whitespace, *original);
+		sprintf(*original, "%s%s%s", whitespace, text, whitespace);
 	}
 }
 
@@ -193,13 +194,13 @@ void prepareScreen(MHLCDScreen *screen){
 	if(screen->backlight == NULL){
 		screen->backlight = false;
 	}
-	if(screen->nextScreenStyle == NULL){
+	if(screen->nextScreenStyle != MHLCDScreenStyleMain || screen->nextScreenStyle != MHLCDScreenStylePointSelection || screen->nextScreenStyle != MHLCDScreenStyleVoltage || screen->nextScreenStyle != MHLCDScreenStyleOff){
 		screen->nextScreenStyle = MHLCDScreenStyleCustom;
 	}
-	if(screen->lastScreenStyle == NULL){
+	if(screen->lastScreenStyle != MHLCDScreenStyleMain || screen->lastScreenStyle != MHLCDScreenStylePointSelection || screen->lastScreenStyle != MHLCDScreenStyleVoltage || screen->lastScreenStyle != MHLCDScreenStyleOff){
 		screen->lastScreenStyle = MHLCDScreenStyleCustom;
 	}
-	if(screen->style == NULL){
+	if(screen->style != MHLCDScreenStyleMain || screen->style != MHLCDScreenStylePointSelection || screen->style != MHLCDScreenStyleVoltage || screen->style != MHLCDScreenStyleOff){
 		screen->style = MHLCDScreenStyleCustom;
 	}
 	if(screen->header != ""){
@@ -239,18 +240,23 @@ bool otherButtonsPressed(MHLCDButton button){
 }
 void waitForPress(){
 	while(nLCDButtons == MHLCDButtonNone){/*We just have to wait a while*/}
-	wait1Msec(MHTimeTenthSecond);
+	wait1Msec(50);
 }
 void waitForRelease(){
 	while(nLCDButtons != MHLCDButtonNone){/*We just have to wait a while*/}
 }
 void flashScreen(MHLCDScreen screen){
 	displayScreen(screen);
-	wait1Msec(MHTimeOneSecond * 5);
+	wait1Msec(5000);
 	displayLastScreen();
 }
 void flashScreenStyle(MHLCDScreenStyle screenStyle){
 	MHLCDScreen newScreen;
 	screenForScreenStyle(screenStyle, &newScreen);
 	flashScreen(newScreen);
+}
+void displayScreenStyle(MHLCDScreenStyle style){
+	MHLCDScreen screen;
+	screenForScreenStyle(style, &screen);
+	displayScreen(screen);
 }

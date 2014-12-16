@@ -12,8 +12,8 @@ void resetEncoders(){                        //Clears drive encoders
 //Caveman-simple driving with nothing
 /////////////////////////////////////////////////////////////////////////////////////////
 void basicDrive(int leftPower, int rightPower){
-	motor[lfDrive] = motor[lbDrive] = leftPower;
- 	motor[rfDrive] = motor[rbDrive] = rightPower;
+	motor[lfDrive] = motor[lmDrive] = motor[lbDrive] = leftPower;
+ 	motor[rfDrive] = motor[rmDrive] = motor[rbDrive] = rightPower;
 }
 /////////////////////////////////////////////////////////////////////////////////////////
 //**Drive**/
@@ -71,17 +71,17 @@ void encoderDriveWithLift(int power, int encoderCount, int position){
 		//Drive robot at power
   	drive(power);
     if(nMotorEncoder[lbDrive] >= encoderCount){
-    	motor[lbDrive]=motor[lfDrive] = 0;
+    	motor[lbDrive] = motor[lfDrive] = 0;
     }
     if(nMotorEncoder[rbDrive] >= encoderCount){
      	motor[rbDrive] = motor[rfDrive] = 0;
     }
   }
   //Slow down near destination
-while(abs(nMotorEncoder[lbDrive]) < encoderCount && abs(nMotorEncoder[rbDrive]) < encoderCount){
+	while(abs(nMotorEncoder[lbDrive]) < encoderCount && abs(nMotorEncoder[rbDrive]) < encoderCount){
   	drive(power);
    	if(nMotorEncoder[lbDrive] >= encoderCount){
-    	motor[lbDrive]=motor[lfDrive] = 0;
+    	motor[lbDrive] = motor[lfDrive] = 0;
     }
     if(nMotorEncoder[rbDrive] >= encoderCount){
     	motor[rbDrive] = motor[rfDrive] = 0;
@@ -141,11 +141,11 @@ void hookSpin(int power, int encoderCount){
 void liftLift(int encoderCount){
 	//int encoderAverage = (abs(nMotorEncoder[leftLiftBottom]) + abs(nMotorEncoder[rightLiftBottom]))/2;
 	while(true){
-		if(abs(nMotorEncoder[rlLift]) < encoderCount){
-			motor[llLift] = motor[lmLift] = motor[ltLift] = motor[rlLift] = motor[rmLift] = motor[rtLift] = 127;
+		if(abs(nMotorEncoder[rbLift]) < encoderCount){
+			motor[lfLift] = motor[lbLift] =  motor[rfLift] = motor[rbLift]  = 127;
 		}
 		else{
-			motor[llLift] = motor[lmLift] = motor[ltLift] = motor[rlLift] = motor[rmLift] = motor[rtLift] = 0;
+			motor[lfLift] = motor[lbLift] =  motor[rfLift] = motor[rbLift] = 0;
 			return;
 		}
 	}
@@ -157,10 +157,11 @@ void liftLift(int encoderCount){
 void lowerLift(int encoderCount){
 	//int encoderAverage = (abs(nMotorEncoder[leftLiftBottom]) + abs(nMotorEncoder[rightLiftBottom]))/2;
 	while(true){
-		if(abs(nMotorEncoder[rlLift]) > encoderCount){
-			motor[llLift] = motor[lmLift] = motor[ltLift] = motor[rlLift] = motor[rmLift] = motor[rtLift] = -127;
-		} else {
-			motor[llLift] = motor[lmLift] = motor[ltLift] = motor[rlLift] = motor[rmLift] = motor[rtLift] = 0;
+		if(abs(nMotorEncoder[rbLift]) > encoderCount){
+			motor[lfLift] = motor[lbLift] = motor[rfLift] = motor[rbLift] = -127;
+		}
+		else{
+			motor[lfLift] = motor[lbLift] = motor[rfLift] = motor[rbLift] = 0;
 			return;
 		}
 	}

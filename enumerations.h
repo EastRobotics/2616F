@@ -41,3 +41,12 @@ typedef enum{
 	MHTimeHalfSecond = 500,
 	MHTimeOneSecond = 1000
 }MHTime;
+//Constant to define the power threshold where the motors will begin to twitch
+static const int MHMotorTwitchThreshold = 30;
+//Defines the side of the robot that something should take place on
+typedef enum{
+	MHRobotSideRight = 0,
+	MHRobotSideLeft = 1,
+	MHRobotSideFront = 2,
+	MHRobotSideBack = 3,
+}MHRobotSide;

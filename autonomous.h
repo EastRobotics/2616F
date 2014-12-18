@@ -166,3 +166,17 @@ void lowerLift(int encoderCount){
 		}
 	}
 }
+void lift(int power){
+	motor[lfLift] = motor[lbLift] = motor[rfLift] = motor[rbLift] = power;
+}
+void stopDrive(MHRobotSide side){
+	 if(side == MHRobotSideRight){
+	   motor[rfDrive] = motor[rmDrive] = motor[rbDrive] = MHMotorPowerStop;
+	 }
+	 else if(side == MHRobotSideLeft){
+	   motor[lfDrive] = motor[lmDrive] = motor[lbDrive] = MHMotorPowerStop;
+	 }
+	 else{
+	   motor[rfDrive] = motor[rmDrive] = motor[rbDrive] = motor[lfDrive] = motor[lmDrive] = motor[lbDrive] = MHMotorPowerStop;
+	 }
+}

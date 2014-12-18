@@ -31,35 +31,42 @@ task usercontrol(){
 	bool rightDriveShouldStop;
 	bool leftDriveShouldStop;
 	//Determine if either drive should stop at the end of this iteration of the loop
-	//Should stop if the vertical channel of either analog stick is less than or equal to 30, else no
-	if(abs(vexRT[Ch2]) <= MHMotorTwitchThreshold){
-		rightDriveShouldStop = true;
+	while(true){
+		if(abs(vexRT[Ch2]) <= 30){
+			rightDriveShouldStop = true;
+		}
+		else{
+			rightDriveShouldStop = false;
+		}
+		if(abs(vexRT[Ch3]) <= 30){
+			leftDriveShouldStop = true;
+		}
+		else{
+			leftDriveShouldStop = false;
+		}
+		if(rightDriveShouldStop){
+			stopDrive(MHRobotSideRight);
+		}
+		else{
+			motor[rfDrive] = motor[rmDrive] = motor[rbDrive] = vexRT[Ch2];
+		}
+		if(leftDriveShouldStop){
+			stopDrive(MHRobotSideLeft);
+		}
+		else{
+			motor[lfDrive] = motor[lmDrive] = motor[lbDrive] = vexRT[Ch3];
+		}
+		//Lift control
+		if(vexRT[Btn6U]){
+			lift(MHMotorPowerMax);
+		}
+		else if(vexRT[Btn6D]){
+			lift(-MHMotorPowerMax);
+		}
+		//If neither button is pressed, the lift must be stopped, or it will keep going
+		else{
+			lift(MHMotorPowerStop);
+		}
+		//TODO: Add pneumatics and button single presses
 	}
-	else{
-		rightDriveShouldStop = false;
-	}
-	if(abs(vexRT[Ch3]) <= MHMotorTwitchThreshold){
-		leftDriveShouldStop = true;
-	}
-	else{
-		leftDriveShouldStop = false;
-	}
-	if(rightDriveShouldStop){
-		stopDrive(MHRobotSideRight);
-	}
-	if(leftDriveShouldStop){
-		stopDrive(MHRobotSideLeft);
-	}
-	//Lift control
-	if(vexRT[Btn6U]){
-		lift(MHMotorPowerMax);
-	}
-	else if(vexRT[Btn6D]){
-		lift(-MHMotorPowerMax);
-	}
-	//If neither button is pressed, the lift must be stopped, or it will keep going
-	else{
-		lift(MHMotorPowerStop);
-	}
-	//TODO: Add pneumatics and button single presses
 }

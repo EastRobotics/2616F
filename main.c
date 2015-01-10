@@ -50,35 +50,65 @@ void pre_auton(){
 task autonomous(){
 	switch(autonSelection){
 		case MHTeamColorBlue:
-			liftForEncoderDistance(1200, MHMotorPowerMax);
+			liftForEncoderDistance(2000, MHMotorPowerMax);
 			basicDrive(MHMotorPowerMax, MHMotorPowerStop);
-			wait1Msec(850);
-			stopDrive();
-			liftCube(MHMotorPowerMax, MHLiftDirectionDown);
-			wait1Msec(MHTimeOneSecond * 3);
-			liftCube(MHMotorPowerStop, MHLiftDirectionStop);
-			basicDrive(-MHMotorPowerHalf, -MHMotorPowerHalf);
+			wait1Msec(MHTimeOneSecond);
+			basicDrive(MHMotorPowerStop, -MHMotorPowerMax);
 			wait1Msec(MHTimeHalfSecond);
+			basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+			wait1Msec(MHTimeTenthSecond);
 			stopDrive();
+			liftForEncoderDistance(1500, -MHMotorPowerMax);
+			liftCube(MHMotorPowerMax, MHLiftDirectionDown);
+			wait1Msec(MHTimeOneSecond + MHTimeHalfSecond);
+			basicDrive(-MHMotorPowerMax, MHMotorPowerStop);
+			stopDrive();
+			wait1Msec(MHTimeOneSecond);
 			//Auton over
 			return;
 		case MHTeamColorRed:
-			liftForEncoderDistance(1200, MHMotorPowerMax);
+			liftForEncoderDistance(2000, MHMotorPowerMax);
 			basicDrive(MHMotorPowerStop, MHMotorPowerMax);
-			wait1Msec(850);
-			stopDrive();
-			liftCube(MHMotorPowerMax, MHLiftDirectionDown);
-			wait1Msec(MHTimeOneSecond * 3);
-			liftCube(MHMotorPowerStop, MHLiftDirectionStop);
-			basicDrive(-MHMotorPowerHalf, -MHMotorPowerHalf);
+			wait1Msec(MHTimeOneSecond);
+			basicDrive(-MHMotorPowerMax, MHMotorPowerStop);
 			wait1Msec(MHTimeHalfSecond);
+			basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+			wait1Msec(MHTimeTenthSecond);
+			stopDrive();
+			liftForEncoderDistance(1500, -MHMotorPowerMax);
+			liftCube(MHMotorPowerMax, MHLiftDirectionDown);
+			wait1Msec(MHTimeOneSecond + MHTimeHalfSecond);
+			basicDrive(MHMotorPowerStop, -MHMotorPowerMax);
+			wait1Msec(MHTimeOneSecond);
 			stopDrive();
 			//Auton over
 			return;
 		default:
-			basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+			//basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+			//wait1Msec(MHTimeOneSecond);
+			//basicDrive(MHMotorPowerStop, MHMotorPowerStlift
+			liftForEncoderDistance(2000, MHMotorPowerMax);
+			basicDrive(MHMotorPowerStop, MHMotorPowerMax);
 			wait1Msec(MHTimeOneSecond);
+			basicDrive(-MHMotorPowerMax, MHMotorPowerStop);
+			wait1Msec(MHTimeHalfSecond);
+			basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+			wait1Msec(MHTimeTenthSecond);
 			basicDrive(MHMotorPowerStop, MHMotorPowerStop);
+			liftForEncoderDistance(1500, -MHMotorPowerMax);
+			liftCube(MHMotorPowerMax, MHLiftDirectionDown);
+			wait1Msec(MHTimeOneSecond + MHTimeHalfSecond);
+			basicDrive(MHMotorPowerStop, -MHMotorPowerMax);
+			wait1Msec(MHTimeOneSecond);
+			basicDrive(-MHMotorPowerMax, -MHMotorPowerMax);
+			wait1Msec(MHTimeOneSecond);
+			basicDrive(MHMotorPowerMax, MHMotorPowerStop);
+			wait1Msec(MHTimeQuarterSecond);
+			basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+			wait1Msec(MHTimeOneSecond * 2);
+			basicDrive(-MHMotorPowerMax, -MHMotorPowerMax);
+			wait1Msec(MHTimeHalfSecond);
+			stopDrive();
 		}
 }
 task usercontrol(){

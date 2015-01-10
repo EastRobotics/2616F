@@ -224,3 +224,6 @@ void liftForEncoderDistance(int count, int power){
 void resetLift(){
 	liftForEncoderDistance(nMotorEncoder[lbLift], -MHMotorPowerMax);
 }
+void liftCube(MHMotorPower speed, MHLiftDirection direction){
+	motor[cubeIntake] = speed * -direction;
+}

@@ -3,7 +3,7 @@
 #pragma config(Sensor, dgtl12, skyriseClaw,    sensorDigitalOut)
 #pragma config(Sensor, I2C_1,  ,               sensorQuadEncoderOnI2CPort,    , AutoAssign)
 #pragma config(Sensor, I2C_2,  ,               sensorQuadEncoderOnI2CPort,    , AutoAssign)
-#pragma config(Motor,  port1,           lIntake,       tmotorVex393_HBridge, openLoop)
+#pragma config(Motor,  port1,           cubeIntake,    tmotorVex393_HBridge, openLoop)
 #pragma config(Motor,  port2,           lmDrive,       tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port3,           lbDrive,       tmotorVex393_MC29, openLoop, encoderPort, None)
 #pragma config(Motor,  port4,           lfLift,        tmotorVex393_MC29, openLoop, reversed)
@@ -51,9 +51,6 @@ task usercontrol(){
 		if(nMotorEncoder[lbLift] < 0){
 			resetEncoders();
 		}
-		if(vexRT[Btn5U] || vexRT[Btn5D]){
-			resetEncoders();
-		}
 		if(nLCDButtons != MHLCDButtonNone){
 			resetEncoders();
 		}
@@ -90,6 +87,16 @@ task usercontrol(){
 		}
 		else if(vexRT[Btn8R]){
 			SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
+		}
+		//Cube Intake
+		if(vexRT[Btn5U]){
+			liftCube(MHMotorPowerMax, MHLiftDirectionUp);
+		}
+		else if(vexRT[Btn5D]){
+			liftCube(MHMotorPowerMax, MHLiftDirectionDown);
+		}
+		else{
+			liftCube(MHMotorPowerStop, MHLiftDirectionStop);
 		}
 	}
 }

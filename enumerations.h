@@ -1,5 +1,6 @@
 #pragma systemFile
 //List of common motor powers for easy referencing
+static const int MHLiftMaxHeight = 904;
 typedef enum{
 	MHMotorPowerStop = 0,
 	//31 is about the minimum power you can assign to a motor before it begins to twitch
@@ -50,3 +51,13 @@ typedef enum{
 	MHRobotSideFront = 2,
 	MHRobotSideBack = 3,
 }MHRobotSide;
+typedef enum{
+	MHLiftDirectionUp = -1,
+	MHLiftDirectionDown = 1,
+	//MHLiftDirectionStop is bridged toll-free to MHMotorPowerStop, because they're the same thing
+	MHLiftDirectionStop = MHMotorPowerStop
+}MHLiftDirection;
+typedef enum{
+	MHPneumaticPositionClosed = 0,
+	MHPneumaticPositionOpen = 1
+}MHPneumaticPosition;

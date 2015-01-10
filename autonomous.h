@@ -12,8 +12,8 @@ void resetEncoders(){                        //Clears lift encoders
 //Caveman-simple driving with nothing
 /////////////////////////////////////////////////////////////////////////////////////////
 void basicDrive(int leftPower, int rightPower){
-	motor[lfDrive] = motor[lmDrive] = motor[lbDrive] = leftPower;
- 	motor[rfDrive] = motor[rmDrive] = motor[rbDrive] = rightPower;
+	motor[lmDrive] = motor[lbDrive] = leftPower;
+ 	motor[rmDrive] = motor[rbDrive] = rightPower;
 }
 /////////////////////////////////////////////////////////////////////////////////////////
 //**Drive**/
@@ -71,20 +71,20 @@ void encoderDriveWithLift(int power, int encoderCount, int position){
 		//Drive robot at power
   	drive(power);
     if(nMotorEncoder[lbDrive] >= encoderCount){
-    	motor[lbDrive] = motor[lfDrive] = 0;
+    	motor[lbDrive] = motor[lmDrive] = 0;
     }
     if(nMotorEncoder[rbDrive] >= encoderCount){
-     	motor[rbDrive] = motor[rfDrive] = 0;
+     	motor[rbDrive] = motor[rmDrive] = 0;
     }
   }
   //Slow down near destination
 	while(abs(nMotorEncoder[lbDrive]) < encoderCount && abs(nMotorEncoder[rbDrive]) < encoderCount){
   	drive(power);
    	if(nMotorEncoder[lbDrive] >= encoderCount){
-    	motor[lbDrive] = motor[lfDrive] = 0;
+    	motor[lbDrive] = motor[lmDrive] = 0;
     }
     if(nMotorEncoder[rbDrive] >= encoderCount){
-    	motor[rbDrive] = motor[rfDrive] = 0;
+    	motor[rbDrive] = motor[rmDrive] = 0;
   	}
   }
   //Turn off after it has reached destination
@@ -166,17 +166,61 @@ void lowerLift(int encoderCount){
 		}
 	}
 }
-void lift(int power){
-	motor[lfLift] = motor[lbLift] = motor[rfLift] = motor[rbLift] = power;
+void lift(int power, MHLiftDirection direction){
+	motor[rfLift] = motor[rbLift] = motor[lfLift] = motor[lbLift] = abs(power) * direction;
+	//if(direction == MHLiftDirectionUp){
+		//if(speed > 82){
+			//motor[lbLift] = motor[lfLift] = speed - 52;
+		//}
+		//else{
+			//motor[lbLift] = motor[lfLift] = MHMotorTwitchThreshold;
+		//}
+	//}
+	//else if(direction == MHLiftDirectionDown){
+		//if(speed > 72){
+			//motor[lbLift] = motor[lfLift] = -speed + 42;
+		//}
+		//else{
+			//motor[lbLift] = motor[lfLift] = -MHMotorTwitchThreshold;
+		//}
+	//}
+	//else if(direction == MHLiftDirectionStop){
+		//motor[lbLift] = motor[lfLift] = MHMotorPowerStop;
+	//}
 }
 void stopDrive(MHRobotSide side){
 	 if(side == MHRobotSideRight){
-	   motor[rfDrive] = motor[rmDrive] = motor[rbDrive] = MHMotorPowerStop;
+	   motor[rmDrive] = motor[rbDrive] = MHMotorPowerStop;
 	 }
 	 else if(side == MHRobotSideLeft){
-	   motor[lfDrive] = motor[lmDrive] = motor[lbDrive] = MHMotorPowerStop;
+	   motor[lmDrive] = motor[lbDrive] = MHMotorPowerStop;
 	 }
 	 else{
-	   motor[rfDrive] = motor[rmDrive] = motor[rbDrive] = motor[lfDrive] = motor[lmDrive] = motor[lbDrive] = MHMotorPowerStop;
+	   motor[rmDrive] = motor[rbDrive] = motor[lmDrive] = motor[lbDrive] = MHMotorPowerStop;
 	 }
+}
+void liftForEncoderDistance(int count, int power){
+	resetEncoders();
+	string first;
+	string second;
+	while(abs(nMotorEncoder[lbLift]) < count){
+		sprintf(first, "%d", abs(nMotorEncoder[lbLift]));
+		sprintf(second, "%d", abs(nMotorEncoder[rbLift]));
+		displayLCDCenteredString(0, first);
+		displayLCDCenteredString(1, second);
+		if(power > 0){
+			lift(power, MHLiftDirectionUp);
+		}
+		else if(power < 0){
+			lift(power, MHLiftDirectionDown);
+		}
+		//Because power is not greater than or less than 0, it's safe to assume it is 0, and the lift should stop
+		else{
+			lift(MHMotorPowerStop, MHLiftDirectionStop);
+		}
+	}
+	lift(MHMotorPowerStop, MHLiftDirectionStop);
+}
+void resetLift(){
+	liftForEncoderDistance(nMotorEncoder[lbLift], -MHMotorPowerMax);
 }

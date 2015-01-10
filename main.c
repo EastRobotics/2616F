@@ -24,13 +24,23 @@
 #include "enumerations.h"
 #include "autonomous.h"
 #include "lcd.h"
+MHTeamColor autonSelection;
 void pre_auton(){
 	bLCDBacklight = true;
 	clearLCD();
-	displayLCDCenteredString(0, "Run auton now?");
-	displayLCDCenteredString(1, "Yes");
+	displayLCDCenteredString(0, "Autonomous?");
+	displayLCDCenteredString(1, "Red    1    Blue");
 	while(true){
-		if(nLCDButtons != MHLCDButtonNone){
+		if(nLCDButtons == MHLCDButtonLeft){
+			autonSelection = MHTeamColorRed;
+			break;
+		}
+		else if(nLCDButtons == MHLCDButtonRight){
+			autonSelection = MHTeamColorBlue;
+			break;
+		}
+		else if(nLCDButtons == MHLCDButtonCenter){
+			autonSelection = MHTeamColorNone;
 			break;
 		}
 	}
@@ -38,9 +48,38 @@ void pre_auton(){
 	bLCDBacklight = false;
 }
 task autonomous(){
-	liftForEncoderDistance(850, MHMotorPowerMax);
-	wait1Msec(MHTimeOneMillisecond * 5);
-	resetLift();
+	switch(autonSelection){
+		case MHTeamColorBlue:
+			liftForEncoderDistance(1200, MHMotorPowerMax);
+			basicDrive(MHMotorPowerMax, MHMotorPowerStop);
+			wait1Msec(850);
+			stopDrive();
+			liftCube(MHMotorPowerMax, MHLiftDirectionDown);
+			wait1Msec(MHTimeOneSecond * 3);
+			liftCube(MHMotorPowerStop, MHLiftDirectionStop);
+			basicDrive(-MHMotorPowerHalf, -MHMotorPowerHalf);
+			wait1Msec(MHTimeHalfSecond);
+			stopDrive();
+			//Auton over
+			return;
+		case MHTeamColorRed:
+			liftForEncoderDistance(1200, MHMotorPowerMax);
+			basicDrive(MHMotorPowerStop, MHMotorPowerMax);
+			wait1Msec(850);
+			stopDrive();
+			liftCube(MHMotorPowerMax, MHLiftDirectionDown);
+			wait1Msec(MHTimeOneSecond * 3);
+			liftCube(MHMotorPowerStop, MHLiftDirectionStop);
+			basicDrive(-MHMotorPowerHalf, -MHMotorPowerHalf);
+			wait1Msec(MHTimeHalfSecond);
+			stopDrive();
+			//Auton over
+			return;
+		default:
+			basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+			wait1Msec(MHTimeOneSecond);
+			basicDrive(MHMotorPowerStop, MHMotorPowerStop);
+		}
 }
 task usercontrol(){
 	//Drive control
@@ -59,13 +98,13 @@ task usercontrol(){
 		displayLCDCenteredString(0, first);
 		displayLCDCenteredString(1, second);
 		if(abs(vexRT[Ch2]) <= 30){
-			stopDrive(MHRobotSideRight);
+			stopDriveSide(MHRobotSideRight);
 		}
 		else{
 			motor[rmDrive] = motor[rbDrive] = vexRT[Ch2];
 		}
 		if(abs(vexRT[Ch3]) <= 30){
-			stopDrive(MHRobotSideLeft);
+			stopDriveSide(MHRobotSideLeft);
 		}
 		else{
 			motor[lmDrive] = motor[lbDrive] = vexRT[Ch3];

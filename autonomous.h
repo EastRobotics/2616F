@@ -188,7 +188,7 @@ void lift(int power, MHLiftDirection direction){
 		//motor[lbLift] = motor[lfLift] = MHMotorPowerStop;
 	//}
 }
-void stopDrive(MHRobotSide side){
+void stopDriveSide(MHRobotSide side){
 	 if(side == MHRobotSideRight){
 	   motor[rmDrive] = motor[rbDrive] = MHMotorPowerStop;
 	 }
@@ -198,6 +198,10 @@ void stopDrive(MHRobotSide side){
 	 else{
 	   motor[rmDrive] = motor[rbDrive] = motor[lmDrive] = motor[lbDrive] = MHMotorPowerStop;
 	 }
+}
+void stopDrive(){
+	stopDriveSide(MHRobotSideLeft);
+	stopDriveSide(MHRobotSideRight);
 }
 void liftForEncoderDistance(int count, int power){
 	resetEncoders();

@@ -19,7 +19,7 @@ void resetEncoders(){                        //Clears lift encoders
 /////////////////////////////////////////////////////////////////////////////////////////
 void basicDrive(int leftPower, int rightPower){
 	motor[lmDrive] = motor[lbDrive] = leftPower;
- 	motor[rmDrive] = motor[rbDrive] = rightPower;
+ 	motor[rDrive] = rightPower;
 }
 /////////////////////////////////////////////////////////////////////////////////////////
 //**Drive**/
@@ -31,10 +31,10 @@ void drive(int power){
 	if(power != 0){
   	basicDrive(power, power);
     //Compares left and right encoder values to straighten robot
-    if(nMotorEncoder[lbDrive] == nMotorEncoder[rbDrive]){
+    if(nMotorEncoder[lbDrive] == nMotorEncoder[rDrive]){
     	basicDrive(power, power);
     }
-    else if(nMotorEncoder[lbDrive] < nMotorEncoder[rbDrive]){
+    else if(nMotorEncoder[lbDrive] < nMotorEncoder[rDrive]){
     	basicDrive(power, power-40);
     }
     else{
@@ -73,24 +73,24 @@ void encoderDrive(int power, int encoderCount){
 // • encoder count must be positive
 /////////////////////////////////////////////////////////////////////////////////////////
 void encoderDriveWithLift(int power, int encoderCount, int position){
-	while(abs(nMotorEncoder[lbDrive]) < encoderCount && abs(nMotorEncoder[rbDrive]) < encoderCount - 300){
+	while(abs(nMotorEncoder[lbDrive]) < encoderCount && abs(nMotorEncoder[rDrive]) < encoderCount - 300){
 		//Drive robot at power
   	drive(power);
     if(nMotorEncoder[lbDrive] >= encoderCount){
     	motor[lbDrive] = motor[lmDrive] = 0;
     }
-    if(nMotorEncoder[rbDrive] >= encoderCount){
-     	motor[rbDrive] = motor[rmDrive] = 0;
+    if(nMotorEncoder[rDrive] >= encoderCount){
+     	motor[rDrive] = motor[rDrive] = 0;
     }
   }
   //Slow down near destination
-	while(abs(nMotorEncoder[lbDrive]) < encoderCount && abs(nMotorEncoder[rbDrive]) < encoderCount){
+	while(abs(nMotorEncoder[lbDrive]) < encoderCount && abs(nMotorEncoder[rDrive]) < encoderCount){
   	drive(power);
    	if(nMotorEncoder[lbDrive] >= encoderCount){
     	motor[lbDrive] = motor[lmDrive] = 0;
     }
-    if(nMotorEncoder[rbDrive] >= encoderCount){
-    	motor[rbDrive] = motor[rmDrive] = 0;
+    if(nMotorEncoder[rDrive] >= encoderCount){
+    	motor[rDrive] = 0;
   	}
   }
   //Turn off after it has reached destination
@@ -177,13 +177,13 @@ void lift(int power, MHLiftDirection direction){
 }
 void stopDriveSide(MHRobotSide side){
 	 if(side == MHRobotSideRight){
-	   motor[rmDrive] = motor[rbDrive] = MHMotorPowerStop;
+	   motor[rDrive] = MHMotorPowerStop;
 	 }
 	 else if(side == MHRobotSideLeft){
 	   motor[lmDrive] = motor[lbDrive] = MHMotorPowerStop;
 	 }
 	 else{
-	   motor[rmDrive] = motor[rbDrive] = motor[lmDrive] = motor[lbDrive] = MHMotorPowerStop;
+	   motor[rDrive] = motor[lmDrive] = motor[lbDrive] = MHMotorPowerStop;
 	 }
 }
 void stopDrive(){
@@ -215,8 +215,13 @@ void liftForEncoderDistance(int count, int power){
 void resetLift(){
 	liftForEncoderDistance(nMotorEncoder[lbLift], -MHMotorPowerMax);
 }
-void liftCube(MHMotorPower speed, MHLiftDirection direction){
-	motor[cubeIntake] = speed * direction;
+void liftCube(MHLiftDirection direction){
+	motor[cubeIntake] = MHMotorPowerMax * direction;
+}
+void liftCubeForTime(int time, MHLiftDirection direction){
+	liftCube(direction);
+	wait1Msec(time);
+	liftCube(MHLiftDirectionStop);
 }
 bool armIsInRangeOfSide(MHSkyriseArmRotationSide side){
 	if(side == MHSkyriseArmRotationSideRightSide || side == MHSkyriseArmRotationSideLeftSide){
@@ -265,7 +270,7 @@ void swingArmToSide(MHSkyriseArmRotationSide side){
 		   direction *= -1;
 		 }
 		 while(currentArmSide() != side){
-		   motor[rIntake] = MHMotorPowerMax * direction;
+		   motor[skyriseArm] = MHMotorPowerMax * direction;
 		 }
 	}
 }

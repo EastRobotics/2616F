@@ -295,7 +295,6 @@ void placeSkyrise(MHSkyrise skyrise){
 	toggleArmSide();
 	liftForEncoderDistance(MHSkyriseLiftInaccuracy, -MHMotorPowerMax);
 	SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
-	resetLift();
 }
 //This *MUST* be called before an auton is run
 void initSkyriseIntakeWithTeamColor(MHTeamColor color){

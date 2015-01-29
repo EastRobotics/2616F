@@ -1,9 +1,10 @@
 #pragma config(I2C_Usage, I2C1, i2cSensors)
 #pragma config(Sensor, in1,    otherBattery,   sensorAnalog)
+#pragma config(Sensor, in2,    armAngle,       sensorPotentiometer)
 #pragma config(Sensor, dgtl12, skyriseClaw,    sensorDigitalOut)
 #pragma config(Sensor, I2C_1,  ,               sensorQuadEncoderOnI2CPort,    , AutoAssign)
 #pragma config(Sensor, I2C_2,  ,               sensorQuadEncoderOnI2CPort,    , AutoAssign)
-#pragma config(Motor,  port1,           cubeIntake,    tmotorVex393_HBridge, openLoop)
+#pragma config(Motor,  port1,           cubeIntake,    tmotorVex393_HBridge, openLoop, reversed)
 #pragma config(Motor,  port2,           lmDrive,       tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port3,           lbDrive,       tmotorVex393_MC29, openLoop, encoderPort, None)
 #pragma config(Motor,  port4,           lfLift,        tmotorVex393_MC29, openLoop, reversed)
@@ -18,13 +19,13 @@
 #pragma platform(VEX)
 //Competition Control and Duration Settings
 #pragma competitionControl(Competition)
-#pragma autonomousDuration(20)
-#pragma userControlDuration(120)
+#pragma autonomousDuration(15)
+#pragma userControlDuration(105)
 #include "Vex_Competition_Includes.h"
 #include "enumerations.h"
 #include "autonomous.h"
 #include "lcd.h"
-MHTeamColor autonSelection;
+bool onePoint = false;
 void pre_auton(){
 	bLCDBacklight = true;
 	clearLCD();
@@ -32,15 +33,16 @@ void pre_auton(){
 	displayLCDCenteredString(1, "Red    1    Blue");
 	while(true){
 		if(nLCDButtons == MHLCDButtonLeft){
-			autonSelection = MHTeamColorRed;
+			initSkyriseIntakeWithTeamColor(MHTeamColorRed);
 			break;
 		}
 		else if(nLCDButtons == MHLCDButtonRight){
-			autonSelection = MHTeamColorBlue;
+			initSkyriseIntakeWithTeamColor(MHTeamColorBlue);
 			break;
 		}
 		else if(nLCDButtons == MHLCDButtonCenter){
-			autonSelection = MHTeamColorNone;
+			onePoint = true;
+			initSkyriseIntakeWithTeamColor(MHTeamColorAny);
 			break;
 		}
 	}
@@ -48,68 +50,87 @@ void pre_auton(){
 	bLCDBacklight = false;
 }
 task autonomous(){
-	switch(autonSelection){
-		case MHTeamColorBlue:
-			liftForEncoderDistance(2000, MHMotorPowerMax);
-			basicDrive(MHMotorPowerMax, MHMotorPowerStop);
-			wait1Msec(MHTimeOneSecond);
-			basicDrive(MHMotorPowerStop, -MHMotorPowerMax);
-			wait1Msec(MHTimeHalfSecond);
-			basicDrive(MHMotorPowerMax, MHMotorPowerMax);
-			wait1Msec(MHTimeTenthSecond);
-			stopDrive();
-			liftForEncoderDistance(1500, -MHMotorPowerMax);
-			liftCube(MHMotorPowerMax, MHLiftDirectionDown);
-			wait1Msec(MHTimeOneSecond + MHTimeHalfSecond);
-			basicDrive(-MHMotorPowerMax, MHMotorPowerStop);
-			stopDrive();
-			wait1Msec(MHTimeOneSecond);
-			//Auton over
-			return;
-		case MHTeamColorRed:
-			liftForEncoderDistance(2000, MHMotorPowerMax);
-			basicDrive(MHMotorPowerStop, MHMotorPowerMax);
-			wait1Msec(MHTimeOneSecond);
-			basicDrive(-MHMotorPowerMax, MHMotorPowerStop);
-			wait1Msec(MHTimeHalfSecond);
-			basicDrive(MHMotorPowerMax, MHMotorPowerMax);
-			wait1Msec(MHTimeTenthSecond);
-			stopDrive();
-			liftForEncoderDistance(1500, -MHMotorPowerMax);
-			liftCube(MHMotorPowerMax, MHLiftDirectionDown);
-			wait1Msec(MHTimeOneSecond + MHTimeHalfSecond);
-			basicDrive(MHMotorPowerStop, -MHMotorPowerMax);
-			wait1Msec(MHTimeOneSecond);
-			stopDrive();
-			//Auton over
-			return;
-		default:
-			//basicDrive(MHMotorPowerMax, MHMotorPowerMax);
-			//wait1Msec(MHTimeOneSecond);
-			//basicDrive(MHMotorPowerStop, MHMotorPowerStlift
-			liftForEncoderDistance(2000, MHMotorPowerMax);
-			basicDrive(MHMotorPowerStop, MHMotorPowerMax);
-			wait1Msec(MHTimeOneSecond);
-			basicDrive(-MHMotorPowerMax, MHMotorPowerStop);
-			wait1Msec(MHTimeHalfSecond);
-			basicDrive(MHMotorPowerMax, MHMotorPowerMax);
-			wait1Msec(MHTimeTenthSecond);
-			basicDrive(MHMotorPowerStop, MHMotorPowerStop);
-			liftForEncoderDistance(1500, -MHMotorPowerMax);
-			liftCube(MHMotorPowerMax, MHLiftDirectionDown);
-			wait1Msec(MHTimeOneSecond + MHTimeHalfSecond);
-			basicDrive(MHMotorPowerStop, -MHMotorPowerMax);
-			wait1Msec(MHTimeOneSecond);
-			basicDrive(-MHMotorPowerMax, -MHMotorPowerMax);
-			wait1Msec(MHTimeOneSecond);
-			basicDrive(MHMotorPowerMax, MHMotorPowerStop);
-			wait1Msec(MHTimeQuarterSecond);
-			basicDrive(MHMotorPowerMax, MHMotorPowerMax);
-			wait1Msec(MHTimeOneSecond * 2);
-			basicDrive(-MHMotorPowerMax, -MHMotorPowerMax);
-			wait1Msec(MHTimeHalfSecond);
-			stopDrive();
+	if(onePoint){
+		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+		wait1Msec(MHTimeOneSecond);
+		stopDrive();
+		//Auton over
+		return;
+	}
+	else{
+		for(int i = 1; i <=5; i++){
+			placeSkyrise(MHSkyriseForInt(i));
 		}
+	}
+	//switch(autonSelection){
+	//	case MHTeamColorBlue:
+	//		liftForEncoderDistance(2000, MHMotorPowerMax);
+	//		basicDrive(MHMotorPowerMax, MHMotorPowerStop);
+	//		wait1Msec(MHTimeOneSecond);
+	//		basicDrive(MHMotorPowerStop, -MHMotorPowerMax);
+	//		wait1Msec(MHTimeHalfSecond);
+	//		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+	//		wait1Msec(MHTimeTenthSecond);
+	//		stopDrive();
+	//		liftForEncoderDistance(1500, -MHMotorPowerMax);
+	//		liftCube(MHMotorPowerMax, MHLiftDirectionDown);
+	//		wait1Msec(MHTimeOneSecond + MHTimeHalfSecond);
+	//		basicDrive(-MHMotorPowerMax, MHMotorPowerStop);
+	//		stopDrive();
+	//		wait1Msec(MHTimeOneSecond);
+	//		//Auton over
+	//		return;
+	//	case MHTeamColorRed:
+	//		liftForEncoderDistance(2000, MHMotorPowerMax);
+	//		basicDrive(MHMotorPowerStop, MHMotorPowerMax);
+	//		wait1Msec(MHTimeOneSecond);
+	//		basicDrive(-MHMotorPowerMax, MHMotorPowerStop);
+	//		wait1Msec(MHTimeHalfSecond);
+	//		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+	//		wait1Msec(MHTimeTenthSecond);
+	//		stopDrive();
+	//		liftForEncoderDistance(1500, -MHMotorPowerMax);
+	//		liftCube(MHMotorPowerMax, MHLiftDirectionDown);
+	//		wait1Msec(MHTimeOneSecond + MHTimeHalfSecond);
+	//		basicDrive(MHMotorPowerStop, -MHMotorPowerMax);
+	//		wait1Msec(MHTimeOneSecond);
+	//		stopDrive();
+	//		//Auton over
+	//		return;
+	//	default:
+	//		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+	//		wait1Msec(MHTimeOneSecond);
+	//		stopDrive();
+	//		//Auton over
+	//		return;
+
+	//		//Programming Skills, for later (scores 7)
+
+	//		//liftForEncoderDistance(2000, MHMotorPowerMax);
+	//		//basicDrive(MHMotorPowerStop, MHMotorPowerMax);
+	//		//wait1Msec(MHTimeOneSecond);
+	//		//basicDrive(-MHMotorPowerMax, MHMotorPowerStop);
+	//		//wait1Msec(MHTimeHalfSecond);
+	//		//basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+	//		//wait1Msec(MHTimeTenthSecond);
+	//		//basicDrive(MHMotorPowerStop, MHMotorPowerStop);
+	//		//liftForEncoderDistance(1500, -MHMotorPowerMax);
+	//		//liftCube(MHMotorPowerMax, MHLiftDirectionDown);
+	//		//wait1Msec(MHTimeOneSecond + MHTimeHalfSecond);
+	//		//basicDrive(MHMotorPowerStop, -MHMotorPowerMax);
+	//		//wait1Msec(MHTimeOneSecond);
+	//		//basicDrive(-MHMotorPowerMax, -MHMotorPowerMax);
+	//		//wait1Msec(MHTimeOneSecond);
+	//		//basicDrive(MHMotorPowerMax, MHMotorPowerStop);
+	//		//wait1Msec(MHTimeQuarterSecond);
+	//		//basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+	//		//wait1Msec(MHTimeOneSecond * 2);
+	//		//basicDrive(-MHMotorPowerMax, -MHMotorPowerMax);
+	//		//wait1Msec(MHTimeHalfSecond);
+	//		//stopDrive();
+	//		//Programming Skills over
+	//		//return;
+	//	}
 }
 task usercontrol(){
 	//Drive control
@@ -124,7 +145,7 @@ task usercontrol(){
 			resetEncoders();
 		}
 		sprintf(first, "%d", nMotorEncoder[lbLift]);
-		sprintf(second, "%d", nMotorEncoder[rbLift]);
+		sprintf(second, "%d", SensorValue[armAngle]);
 		displayLCDCenteredString(0, first);
 		displayLCDCenteredString(1, second);
 		if(abs(vexRT[Ch2]) <= 30){
@@ -156,6 +177,16 @@ task usercontrol(){
 		}
 		else if(vexRT[Btn8R]){
 			SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
+		}
+		//Skyrise arm rotation
+		if(vexRT[Btn7L]){
+			motor[rIntake] = MHMotorPowerMax;
+		}
+		else if(vexRT[Btn7R]){
+			motor[rIntake] = -MHMotorPowerMax;
+		}
+		else{
+			motor[rIntake] = MHMotorPowerStop;
 		}
 		//Cube Intake
 		if(vexRT[Btn5U]){

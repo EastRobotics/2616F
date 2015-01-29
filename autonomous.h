@@ -1,4 +1,10 @@
 #pragma systemFile
+#ifndef enums
+//This file depends on enumerations.h
+#include "enumerations.h"
+#endif
+MHSkyriseArmRotationSide skyriseSide;
+MHTeamColor roundColor;
 /////////////////////////////////////////////////////////////////////////////////////////
 //**Reset encoders**/
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -168,25 +174,6 @@ void lowerLift(int encoderCount){
 }
 void lift(int power, MHLiftDirection direction){
 	motor[rfLift] = motor[rbLift] = motor[lfLift] = motor[lbLift] = abs(power) * direction;
-	//if(direction == MHLiftDirectionUp){
-		//if(speed > 82){
-			//motor[lbLift] = motor[lfLift] = speed - 52;
-		//}
-		//else{
-			//motor[lbLift] = motor[lfLift] = MHMotorTwitchThreshold;
-		//}
-	//}
-	//else if(direction == MHLiftDirectionDown){
-		//if(speed > 72){
-			//motor[lbLift] = motor[lfLift] = -speed + 42;
-		//}
-		//else{
-			//motor[lbLift] = motor[lfLift] = -MHMotorTwitchThreshold;
-		//}
-	//}
-	//else if(direction == MHLiftDirectionStop){
-		//motor[lbLift] = motor[lfLift] = MHMotorPowerStop;
-	//}
 }
 void stopDriveSide(MHRobotSide side){
 	 if(side == MHRobotSideRight){
@@ -229,5 +216,127 @@ void resetLift(){
 	liftForEncoderDistance(nMotorEncoder[lbLift], -MHMotorPowerMax);
 }
 void liftCube(MHMotorPower speed, MHLiftDirection direction){
-	motor[cubeIntake] = speed * -direction;
+	motor[cubeIntake] = speed * direction;
+}
+bool armIsInRangeOfSide(MHSkyriseArmRotationSide side){
+	if(side == MHSkyriseArmRotationSideRightSide || side == MHSkyriseArmRotationSideLeftSide){
+		if(SensorValue[armAngle] <= side + 50 && SensorValue[armAngle] >= side - 50){
+			return true;
+		}
+	}
+	else if(side == MHSkyriseArmRotationSideMiddle){
+		if(SensorValue[armAngle] > MHSkyriseArmRotationSideRightSide && SensorValue[armAngle] < MHSkyriseArmRotationSideLeftSide){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	else if(side == MHSkyriseArmRotationSideOutOfBounds){
+		if(SensorValue[armAngle] < MHSkyriseArmRotationSideRightSide || SensorValue[armAngle] > MHSkyriseArmRotationSideLeftSide){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	else{
+		return false;
+	}
+}
+MHSkyriseArmRotationSide currentArmSide(){
+	if(armIsInRangeOfSide(MHSkyriseArmRotationSideLeftSide)){
+		return MHSkyriseArmRotationSideLeftSide;
+	}
+	else if(armIsInRangeOfSide(MHSkyriseArmRotationSideMiddle)){
+		return MHSkyriseArmRotationSideMiddle;
+	}
+	else if(armIsInRangeOfSide(MHSkyriseArmRotationSideRightSide)){
+		return MHSkyriseArmRotationSideRightSide;
+	}
+	else{
+		return MHSkyriseArmRotationSideOutOfBounds;
+	}
+}
+void swingArmToSide(MHSkyriseArmRotationSide side){
+	if(side != MHSkyriseArmRotationSideOutOfBounds){
+		int direction = 1;
+		 if(side == MHSkyriseArmRotationSideRightSide || (side == MHSkyriseArmRotationSideMiddle && SensorValue[armAngle] > MHSkyriseArmRotationSideMiddle)){
+		   direction *= -1;
+		 }
+		 while(currentArmSide() != side){
+		   motor[rIntake] = MHMotorPowerMax * direction;
+		 }
+	}
+}
+void toggleArmSide(){
+	if(currentArmSide() == MHSkyriseArmRotationSideRightSide){
+		swingArmToSide(MHSkyriseArmRotationSideLeftSide);
+	}
+	else if(currentArmSide() == MHSkyriseArmRotationSideLeftSide){
+		swingArmToSide(MHSkyriseArmRotationSideRightSide);
+	}
+	else{
+		//Just in case it's out of bounds (or in the middle), we'll default to swinging to whatever side the skyrise is on
+		swingArmToSide(skyriseSide);
+	}
+}
+void placeSkyrise(MHSkyrise skyrise){
+	//First, let's make sure that the claw is unclenched
+	SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
+	//Then, let's make sure the lift is at the bottom
+	resetLift();
+	//At this point, we always want the claw to be on the side of the new skyrise piece
+	if(currentArmSide() != skyriseSide){
+		toggleArmSide();
+	}
+	SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
+	liftForEncoderDistance(skyrise, MHMotorPowerMax);
+	toggleArmSide();
+	liftForEncoderDistance(MHSkyriseLiftInaccuracy, -MHMotorPowerMax);
+	SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
+	resetLift();
+}
+//This *MUST* be called before an auton is run
+void initSkyriseIntakeWithTeamColor(MHTeamColor color){
+	roundColor = color;
+	SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
+	if(color == MHTeamColorRed){
+		skyriseSide = MHSkyriseArmRotationSideRightSide;
+	}
+	else{
+		skyriseSide = MHSkyriseArmRotationSideLeftSide;
+	}
+}
+MHSkyrise MHSkyriseForInt(int count){
+	switch(count){
+		case 1:
+			return MHSkyriseOneSkyrise;
+		case 2:
+			return MHSkyriseTwoSkyrises;
+		case 3:
+			return MHSkyriseThreeSkyrises;
+		case 4:
+			return MHSkyriseFourSkyrises;
+		case 5:
+			return MHSkyriseFiveSkyrises;
+		default:
+			return MHSkyriseLiftInaccuracy;
+	}
+}
+int intForMHSkyrise(MHSkyrise skyrise){
+	switch(skyrise){
+		case MHSkyriseOneSkyrise:
+			return 1;
+		case MHSkyriseTwoSkyrises:
+			return 2;
+		case MHSkyriseThreeSkyrises:
+			return 3;
+		case MHSkyriseFourSkyrises:
+			return 4;
+		case MHSkyriseFiveSkyrises:
+			return 5;
+		default:
+			return MHSkyriseLiftInaccuracy;
+	}
 }

@@ -6,6 +6,8 @@
 static const int MHLiftMaxHeight = 904;
 typedef enum{
 	MHMotorPowerStop = 0,
+	//If you wanna stall the motors, it's safe to put it at a power of 30, but that's about the lowest it's safe to go
+	MHMotorPowerStall = 30,
 	//31 is about the minimum power you can assign to a motor before it begins to twitch
 	MHMotorPowerMin = 31,
 	//While a true half is 63.5, we're defining integer constants here, so we'll give it the high end
@@ -62,8 +64,8 @@ typedef enum{
 }MHLiftDirection;
 typedef enum{
 	//Handily, normal C does not have a boolean type. In that language, 0 is false and anything else is true. Since ROBOTC is derived from C, the same logic can be used here
-	MHPneumaticPositionClosed = 0,
-	MHPneumaticPositionOpen = 1
+	MHPneumaticPositionClosed = 1,
+	MHPneumaticPositionOpen = 0
 }MHPneumaticPosition;
 typedef enum{
 	//These all are raw approximate encoder count values, for use in the liftForEncoderDistance function of autonomous.h
@@ -77,7 +79,7 @@ typedef enum{
 typedef enum{
 	//These are all raw approximate potentiometer values, for use in the swingArmToSide fuction of autonomous.h
 	MHSkyriseArmRotationSideRightSide = 925,
-	MHSkyriseArmRotationSideLeftSide = 2760,
+	MHSkyriseArmRotationSideLeftSide = 2725,
 	MHSkyriseArmRotationSideMiddle = 1850,
 	MHSkyriseArmRotationSideOutOfBounds
 }MHSkyriseArmRotationSide;

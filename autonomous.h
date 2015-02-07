@@ -225,7 +225,7 @@ void liftCubeForTime(int time, MHLiftDirection direction){
 }
 bool armIsInRangeOfSide(MHSkyriseArmRotationSide side){
 	if(side == MHSkyriseArmRotationSideRightSide || side == MHSkyriseArmRotationSideLeftSide){
-		if(SensorValue[armAngle] <= side + 50 && SensorValue[armAngle] >= side - 50){
+		if(SensorValue[armAngle] <= side + 100 && SensorValue[armAngle] >= side - 100){
 			return true;
 		}
 	}
@@ -269,9 +269,11 @@ void swingArmToSide(MHSkyriseArmRotationSide side){
 		 if(side == MHSkyriseArmRotationSideRightSide || (side == MHSkyriseArmRotationSideMiddle && SensorValue[armAngle] > MHSkyriseArmRotationSideMiddle)){
 		   direction *= -1;
 		 }
+		 displayLCDCenteredString(0, "Moving arm");
 		 while(currentArmSide() != side){
 		   motor[skyriseArm] = MHMotorPowerMax * direction;
 		 }
+		 displayLCDCenteredString(1, "Arm moved");
 	}
 }
 void toggleArmSide(){
@@ -296,6 +298,7 @@ void placeSkyrise(MHSkyrise skyrise){
 		toggleArmSide();
 	}
 	SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
+	displayLCDCenteredString(0, "Closed claw");
 	liftForEncoderDistance(skyrise, MHMotorPowerMax);
 	toggleArmSide();
 	liftForEncoderDistance(MHSkyriseLiftInaccuracy, -MHMotorPowerMax);

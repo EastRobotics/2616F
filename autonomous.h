@@ -347,3 +347,59 @@ int intForMHSkyrise(MHSkyrise skyrise){
 			return MHSkyriseLiftInaccuracy;
 	}
 }
+void runAutonomousForTeamColor(MHTeamColor color){
+	if(color == MHTeamColorRed || color == MHTeamColorBlue){
+		int wallSide = 1;
+		if(color == MHTeamColorBlue){
+			wallSide *= -1;
+		}
+		int skyriseBaseSide = -wallSide;
+		//Release the claw
+		liftCubeForTime(MHTimeTenthSecond * 2, MHLiftDirectionDown);
+		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
+		//Grab the first skyrise
+		resetLift();
+		motor[skyriseArm] = MHMotorPowerHalf * wallSide;
+		wait1Msec(MHTimeHalfSecond);
+		motor[skyriseArm] = MHMotorPowerStop;
+		SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
+		wait1Msec(MHTimeOneSecond);
+		//Place the skyrise
+		liftForEncoderDistance(MHSkyriseOneSkyrise, MHMotorPowerMax);
+		liftCubeForTime(MHTimeTenthSecond * 3, MHLiftDirectionDown);
+		motor[skyriseArm] = MHMotorPowerHalf * skyriseBaseSide;
+		wait1Msec(MHTimeOneSecond);
+		resetLift();
+		wait1Msec(MHTimeHalfSecond);
+		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
+		//Grab the next skyrise
+		motor[skyriseArm] = MHMotorPowerHalf * wallSide;
+		wait1Msec(MHTimeOneSecond);
+		motor[skyriseArm] = MHMotorPowerStop;
+		wait1Msec(MHTimeHalfSecond);
+		SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
+		//Place the skyrise
+		liftForEncoderDistance(MHSkyriseTwoSkyrises, MHMotorPowerMax);
+		motor[skyriseArm] = MHMotorPowerHalf * skyriseBaseSide;
+		wait1Msec(MHTimeOneSecond);
+		liftForEncoderDistance(MHSkyriseLiftInaccuracy, -MHMotorPowerMax);
+		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
+		//Grab the 3rd skyrise
+		resetLift();
+		motor[skyriseArm] = MHMotorPowerMax * wallSide;
+		wait1Msec(MHTimeOneSecond);
+		motor[skyriseArm] = MHMotorPowerStop;
+		SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
+		//Place the skyrise
+		liftForEncoderDistance(MHSkyriseThreeSkyrises, MHMotorPowerMax);
+		motor[skyriseArm] = MHMotorPowerHalf * skyriseBaseSide;
+		wait1Msec(MHTimeOneSecond);
+		liftForEncoderDistance(MHSkyriseLiftInaccuracy, -MHMotorPowerMax);
+		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
+		//Reset the skyrise arm
+		resetLift();
+		motor[skyriseArm] = MHMotorPowerMax * wallSide;
+		wait1Msec(MHTimeOneSecond);
+		motor[skyriseArm] = MHMotorPowerStop;
+	}
+}

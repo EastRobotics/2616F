@@ -74,7 +74,7 @@ typedef enum{
 	MHSkyriseThreeSkyrises = 1500,
 	MHSkyriseFourSkyrises = 2000,
 	MHSkyriseFiveSkyrises = 2900,
-	MHSkyriseLiftInaccuracy = 200
+	MHSkyriseLiftInaccuracy = 400
 }MHSkyrise;
 typedef enum{
 	//These are all raw approximate potentiometer values, for use in the swingArmToSide fuction of autonomous.h

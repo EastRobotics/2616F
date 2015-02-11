@@ -56,123 +56,8 @@ task autonomous(){
 		return;
 	}
 	else{
-		//In a perfect world, this code would work
-		//liftCubeForTime(MHTimeQuarterSecond, MHLiftDirectionDown);
-		//for(int i = 1; i <= 5; i++){
-		//	placeSkyrise(MHSkyriseForInt(i));
-		//}
-		//We don't live in a perfect world
-		//if(skyriseSide == MHSkyriseArmRotationSideLeftSide){
-		liftCubeForTime(MHTimeOneSecond * 2, MHLiftDirectionDown);
-		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
-		if(skyriseSide == MHSkyriseArmRotationSideRightSide){
-			resetLift();
-			motor[skyriseArm] = MHMotorPowerHalf;
-			wait1Msec(MHTimeOneSecond * 2);
-			motor[skyriseArm] = MHMotorPowerStop;
-			SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
-			wait1Msec(MHTimeOneSecond);
-			liftForEncoderDistance(MHSkyriseOneSkyrise, MHMotorPowerMax);
-			motor[skyriseArm] = -MHMotorPowerHalf;
-			wait1Msec(MHTimeOneSecond * 2);
-			resetLift();
-			wait1Msec(MHTimeOneSecond * 2);
-			SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
-			motor[skyriseArm] = MHMotorPowerStop;
-			wait1Msec(MHTimeOneSecond);
-			motor[skyriseArm] = -MHMotorPowerMax;
-			wait1Msec(MHTimeOneSecond);
-			motor[skyriseArm] = MHMotorPowerStop;
-		}
-		else{
-			resetLift();
-			motor[skyriseArm] = -MHMotorPowerHalf;
-			wait1Msec(MHTimeOneSecond * 2);
-			motor[skyriseArm] = MHMotorPowerStop;
-			SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
-			wait1Msec(MHTimeOneSecond);
-			liftForEncoderDistance(MHSkyriseOneSkyrise, MHMotorPowerMax);
-			motor[skyriseArm] = MHMotorPowerHalf;
-			wait1Msec(MHTimeOneSecond * 2);
-			resetLift();
-			wait1Msec(MHTimeOneSecond * 2);
-			SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
-			motor[skyriseArm] = MHMotorPowerStop;
-			wait1Msec(MHTimeOneSecond);
-			motor[skyriseArm] = -MHMotorPowerMax;
-			wait1Msec(MHTimeOneSecond);
-			motor[skyriseArm] = MHMotorPowerStop;
-		}
+		runAutonomousForTeamColor(roundColor);
 	}
-	//switch(autonSelection){
-	//	case MHTeamColorBlue:
-	//		liftForEncoderDistance(2000, MHMotorPowerMax);
-	//		basicDrive(MHMotorPowerMax, MHMotorPowerStop);
-	//		wait1Msec(MHTimeOneSecond);
-	//		basicDrive(MHMotorPowerStop, -MHMotorPowerMax);
-	//		wait1Msec(MHTimeHalfSecond);
-	//		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
-	//		wait1Msec(MHTimeTenthSecond);
-	//		stopDrive();
-	//		liftForEncoderDistance(1500, -MHMotorPowerMax);
-	//		liftCube(MHMotorPowerMax, MHLiftDirectionDown);
-	//		wait1Msec(MHTimeOneSecond + MHTimeHalfSecond);
-	//		basicDrive(-MHMotorPowerMax, MHMotorPowerStop);
-	//		stopDrive();
-	//		wait1Msec(MHTimeOneSecond);
-	//		//Auton over
-	//		return;
-	//	case MHTeamColorRed:
-	//		liftForEncoderDistance(2000, MHMotorPowerMax);
-	//		basicDrive(MHMotorPowerStop, MHMotorPowerMax);
-	//		wait1Msec(MHTimeOneSecond);
-	//		basicDrive(-MHMotorPowerMax, MHMotorPowerStop);
-	//		wait1Msec(MHTimeHalfSecond);
-	//		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
-	//		wait1Msec(MHTimeTenthSecond);
-	//		stopDrive();
-	//		liftForEncoderDistance(1500, -MHMotorPowerMax);
-	//		liftCube(MHMotorPowerMax, MHLiftDirectionDown);
-	//		wait1Msec(MHTimeOneSecond + MHTimeHalfSecond);
-	//		basicDrive(MHMotorPowerStop, -MHMotorPowerMax);
-	//		wait1Msec(MHTimeOneSecond);
-	//		stopDrive();
-	//		//Auton over
-	//		return;
-	//	default:
-	//		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
-	//		wait1Msec(MHTimeOneSecond);
-	//		stopDrive();
-	//		//Auton over
-	//		return;
-
-	//		//Programming Skills, for later (scores 7)
-
-	//		//liftForEncoderDistance(2000, MHMotorPowerMax);
-	//		//basicDrive(MHMotorPowerStop, MHMotorPowerMax);
-	//		//wait1Msec(MHTimeOneSecond);
-	//		//basicDrive(-MHMotorPowerMax, MHMotorPowerStop);
-	//		//wait1Msec(MHTimeHalfSecond);
-	//		//basicDrive(MHMotorPowerMax, MHMotorPowerMax);
-	//		//wait1Msec(MHTimeTenthSecond);
-	//		//basicDrive(MHMotorPowerStop, MHMotorPowerStop);
-	//		//liftForEncoderDistance(1500, -MHMotorPowerMax);
-	//		//liftCube(MHMotorPowerMax, MHLiftDirectionDown);
-	//		//wait1Msec(MHTimeOneSecond + MHTimeHalfSecond);
-	//		//basicDrive(MHMotorPowerStop, -MHMotorPowerMax);
-	//		//wait1Msec(MHTimeOneSecond);
-	//		//basicDrive(-MHMotorPowerMax, -MHMotorPowerMax);
-	//		//wait1Msec(MHTimeOneSecond);
-	//		//basicDrive(MHMotorPowerMax, MHMotorPowerStop);
-	//		//wait1Msec(MHTimeQuarterSecond);
-	//		//basicDrive(MHMotorPowerMax, MHMotorPowerMax);
-	//		//wait1Msec(MHTimeOneSecond * 2);
-	//		//basicDrive(-MHMotorPowerMax, -MHMotorPowerMax);
-	//		//wait1Msec(MHTimeHalfSecond);
-	//		//stopDrive();
-	//		//Programming Skills over
-	//		//return;
-	//	}
 }
 task usercontrol(){
 	//Drive control
@@ -221,13 +106,22 @@ task usercontrol(){
 			SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
 		}
 		//Skyrise arm rotation
+		static bool skyriseArmShouldStall = false;
 		if(vexRT[Btn7R]){
-			motor[skyriseArm] = MHMotorPowerHalf;
+			motor[skyriseArm] = MHMotorPowerMax;
 		}
 		else if(vexRT[Btn7L]){
-			motor[skyriseArm] = -MHMotorPowerHalf;
+			motor[skyriseArm] = -MHMotorPowerMax;
 		}
 		else if(vexRT[Btn7U]){
+			if(skyriseArmShouldStall){
+				skyriseArmShouldStall = false;
+			}
+			else{
+				skyriseArmShouldStall = true;
+			}
+		}
+		else if(skyriseArmShouldStall){
 			motor[skyriseArm] = MHMotorPowerStall;
 		}
 		else{

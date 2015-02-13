@@ -288,21 +288,64 @@ void toggleArmSide(){
 		swingArmToSide(skyriseSide);
 	}
 }
-void placeSkyrise(MHSkyrise skyrise){
-	//First, let's make sure that the claw is unclenched
-	SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
-	//Then, let's make sure the lift is at the bottom
-	resetLift();
-	//At this point, we always want the claw to be on the side of the new skyrise piece
-	if(currentArmSide() != skyriseSide){
-		toggleArmSide();
+MHSkyrise MHSkyriseForInt(int count){
+	if(count >= 1 && count <= 5){
+		return skyrises[count - 1];
 	}
-	SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
-	displayLCDCenteredString(0, "Closed claw");
-	liftForEncoderDistance(skyrise, MHMotorPowerMax);
-	toggleArmSide();
-	liftForEncoderDistance(MHSkyriseLiftInaccuracy, -MHMotorPowerMax);
-	SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
+	else{
+		return MHSkyriseLiftInaccuracy;
+	}
+}
+int intForMHSkyrise(MHSkyrise skyrise){
+	for(int i = 0; i < (sizeof(skyrises)/sizeof(skyrises[0])); i++){
+		if(skyrise == skyrises[i]){
+			return i;
+		}
+	}
+	return NULL;
+}
+//Right now, this is timing-based, which is far from ideal. Hopefully, I can use the potentiometer in the future
+void placeSkyrise(MHSkyrise skyrise, MHTeamColor matchColor){
+	if(matchColor == MHTeamColorRed || matchColor == MHTeamColorBlue){
+		int wallSide = 1;
+		if(matchColor == MHTeamColorBlue){
+			wallSide *= -1;
+		}
+		int skyriseBaseSide = -wallSide;
+		static int invocations = 1;
+		//First, let's make sure that the claw is unclenched
+		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
+		//Then, let's make sure the lift is at the bottom
+		resetLift();
+		//Grab the skyrise
+		motor[skyriseArm] = MHMotorPowerMax * wallSide;
+		//If this is the first time we're running, we only need to take half as long to move to the wall
+		if(invocations == 1){
+			wait1Msec(MHTimeHalfSecond);
+		}
+		else{
+			wait1Msec(MHTimeOneSecond);
+		}
+		motor[skyriseArm] = MHMotorPowerStop;
+		SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
+		wait1Msec(MHTimeOneSecond);
+		//Actually place the skyrise
+		liftForEncoderDistance(skyrise, MHMotorPowerMax);
+		//If this is the first time we've run, we want to make sure the cube intake is out of the way, and ready to use in driver control
+		if(invocations == 1){
+			liftCubeForTime(MHTimeTenthSecond * 3, MHLiftDirectionDown);
+		}
+		motor[skyriseArm] = MHMotorPowerHalf * skyriseBaseSide;
+		wait1Msec(MHTimeOneSecond);
+		liftForEncoderDistance(MHSkyriseLiftInaccuracy, -MHMotorPowerMax);
+		//If this is still the first time we're running, we need to just continue to the bottom
+		if(intForMHSkyrise(skyrise) == 1){
+			resetLift();
+		}
+		wait1Msec(MHTimeHalfSecond);
+		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
+		invocations++;
+	}
 }
 //This *MUST* be called before an auton is run
 void initSkyriseIntakeWithTeamColor(MHTeamColor color){
@@ -313,38 +356,6 @@ void initSkyriseIntakeWithTeamColor(MHTeamColor color){
 	}
 	else{
 		skyriseSide = MHSkyriseArmRotationSideLeftSide;
-	}
-}
-MHSkyrise MHSkyriseForInt(int count){
-	switch(count){
-		case 1:
-			return MHSkyriseOneSkyrise;
-		case 2:
-			return MHSkyriseTwoSkyrises;
-		case 3:
-			return MHSkyriseThreeSkyrises;
-		case 4:
-			return MHSkyriseFourSkyrises;
-		case 5:
-			return MHSkyriseFiveSkyrises;
-		default:
-			return MHSkyriseLiftInaccuracy;
-	}
-}
-int intForMHSkyrise(MHSkyrise skyrise){
-	switch(skyrise){
-		case MHSkyriseOneSkyrise:
-			return 1;
-		case MHSkyriseTwoSkyrises:
-			return 2;
-		case MHSkyriseThreeSkyrises:
-			return 3;
-		case MHSkyriseFourSkyrises:
-			return 4;
-		case MHSkyriseFiveSkyrises:
-			return 5;
-		default:
-			return MHSkyriseLiftInaccuracy;
 	}
 }
 void runAutonomousForTeamColor(MHTeamColor color){
@@ -366,7 +377,7 @@ void runAutonomousForTeamColor(MHTeamColor color){
 		wait1Msec(MHTimeOneSecond);
 		//Place the skyrise
 		liftForEncoderDistance(MHSkyriseOneSkyrise, MHMotorPowerMax);
-		liftCubeForTime(MHTimeTenthSecond * 3, MHLiftDirectionDown);
+		liftCubeForTime(MHTimeTenthSecond * 7, MHLiftDirectionDown);
 		motor[skyriseArm] = MHMotorPowerHalf * skyriseBaseSide;
 		wait1Msec(MHTimeOneSecond);
 		resetLift();
@@ -394,7 +405,7 @@ void runAutonomousForTeamColor(MHTeamColor color){
 		liftForEncoderDistance(MHSkyriseThreeSkyrises, MHMotorPowerMax);
 		motor[skyriseArm] = MHMotorPowerHalf * skyriseBaseSide;
 		wait1Msec(MHTimeOneSecond);
-		liftForEncoderDistance(MHSkyriseLiftInaccuracy, -MHMotorPowerMax);
+		liftForEncoderDistance(MHSkyriseLiftInaccuracy * 1.5, -MHMotorPowerMax);
 		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
 		//Reset the skyrise arm
 		resetLift();

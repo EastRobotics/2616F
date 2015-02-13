@@ -5,7 +5,7 @@
 #endif
 //Different default screen types, used by the displayScreen function in lcd.h to display a preconfigured screen
 typedef enum{
-	MHLCDScreenStyleMain = 1,
+	MHLCDScreenStyleColorSelection = 1,
 	MHLCDScreenStylePointSelection = 2,
 	MHLCDScreenStyleVoltage = 3,
 	MHLCDScreenStyleOff = 0,
@@ -98,34 +98,36 @@ void screenForScreenStyle(MHLCDScreenStyle style, MHLCDScreen *screen){
 	string header;
 	string footer;
 	switch(style){
-		case MHLCDScreenStyleMain:
-			screen->style = MHLCDScreenStyleMain;
-			screen->lastScreenStyle = MHLCDScreenStyleMain;
-			screen->nextScreenStyle = MHLCDScreenStylePointSelection;
+		case MHLCDScreenStyleColorSelection:
+			screen->style = MHLCDScreenStyleColorSelection;
+			screen->lastScreenStyle = MHLCDScreenStylePointSelection;
+			screen->nextScreenStyle = MHLCDScreenStyleVoltage;
 			screen->backlight = true;
 			screen->header = "2616F";
 			screen->topLine = header;
 			screen->rightOption = "Blue";
-			screen->middleOption = "None";
+			screen->middleOption = "";
 			screen->leftOption = "Red";
+			screen->footer = "Red         Blue";
 			screen->footer = screen->bottomLine;
 			break;
 		case MHLCDScreenStylePointSelection:
 			screen->style = MHLCDScreenStylePointSelection;
-			screen->lastScreenStyle = MHLCDScreenStyleMain;
+			screen->lastScreenStyle = MHLCDScreenStyleVoltage;
+			screen->nextScreenStyle = MHLCDScreenStyleColorSelection;
 			screen->backlight = true;
 			screen->header = "Points";
 			screen->topLine = header;
-			screen->leftOption = "3";
-			screen->middleOption = "Back";
-			screen->rightOption = "5";
-			screen->bottomLine = "3     Back     5";
+			screen->leftOption = "1";
+			screen->middleOption = "2";
+			screen->rightOption = "3";
+			screen->bottomLine = "1      2       3";
 			screen->footer = screen->bottomLine;
 			break;
 		case MHLCDScreenStyleVoltage:
 			screen->style = MHLCDScreenStyleVoltage;
-			screen->lastScreenStyle = MHLCDScreenStylePointSelection;
-			screen->nextScreenStyle = MHLCDScreenStyleOff;
+			screen->lastScreenStyle = MHLCDScreenStyleOff;
+			screen->nextScreenStyle = MHLCDScreenStylePointSelection;
 			screen->backlight = false;
 			screen->header = "2616F";
 			screen->topLine = header;
@@ -194,13 +196,13 @@ void prepareScreen(MHLCDScreen *screen){
 	if(screen->backlight == NULL){
 		screen->backlight = false;
 	}
-	if(screen->nextScreenStyle != MHLCDScreenStyleMain || screen->nextScreenStyle != MHLCDScreenStylePointSelection || screen->nextScreenStyle != MHLCDScreenStyleVoltage || screen->nextScreenStyle != MHLCDScreenStyleOff){
+	if(screen->nextScreenStyle != MHLCDScreenStyleColorSelection || screen->nextScreenStyle != MHLCDScreenStylePointSelection || screen->nextScreenStyle != MHLCDScreenStyleVoltage || screen->nextScreenStyle != MHLCDScreenStyleOff){
 		screen->nextScreenStyle = MHLCDScreenStyleCustom;
 	}
-	if(screen->lastScreenStyle != MHLCDScreenStyleMain || screen->lastScreenStyle != MHLCDScreenStylePointSelection || screen->lastScreenStyle != MHLCDScreenStyleVoltage || screen->lastScreenStyle != MHLCDScreenStyleOff){
+	if(screen->lastScreenStyle != MHLCDScreenStyleColorSelection || screen->lastScreenStyle != MHLCDScreenStylePointSelection || screen->lastScreenStyle != MHLCDScreenStyleVoltage || screen->lastScreenStyle != MHLCDScreenStyleOff){
 		screen->lastScreenStyle = MHLCDScreenStyleCustom;
 	}
-	if(screen->style != MHLCDScreenStyleMain || screen->style != MHLCDScreenStylePointSelection || screen->style != MHLCDScreenStyleVoltage || screen->style != MHLCDScreenStyleOff){
+	if(screen->style != MHLCDScreenStyleColorSelection || screen->style != MHLCDScreenStylePointSelection || screen->style != MHLCDScreenStyleVoltage || screen->style != MHLCDScreenStyleOff){
 		screen->style = MHLCDScreenStyleCustom;
 	}
 	if(screen->header != ""){
@@ -244,6 +246,9 @@ void waitForPress(){
 }
 void waitForRelease(){
 	while(nLCDButtons != MHLCDButtonNone){/*We just have to wait a while*/}
+}
+void waitForPressOfButton(MHLCDButton button){
+	while(nLCDButtons != button){/*We just have to wait a while*/}
 }
 void flashScreen(MHLCDScreen screen){
 	displayScreen(screen);

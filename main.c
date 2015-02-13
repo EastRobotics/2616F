@@ -25,7 +25,38 @@
 #include "autonomous.h"
 #include "lcd.h"
 bool skills = false;
+MHSkyrise top;
 void pre_auton(){
+	/*displayScreenStyle(MHLCDScreenStyleVoltage);
+	//Waiting for events in ROBOTC is pretty stupid
+	waitForPressOfButton(MHLCDButtonCenter);
+	displayNextScreen();
+	//Here, we figue out how many points we want to score
+	while(true){
+		if(nLCDButtons == MHLCDButtonLeft){
+			top = MHSkyriseOneSkyrise;
+			break;
+		}
+		else if(nLCDButtons == MHLCDButtonCenter){
+			top = MHSkyriseTwoSkyrises;
+			break;
+		}
+		else if(nLCDButtons == MHLCDButtonRight){
+			top = MHSkyriseThreeSkyrises;
+			break;
+		}
+	}
+	displayNextScreen();
+	//Now we need to figure out what side we're on
+	while(true){
+		if(nLCDButtons == MHLCDButtonLeft){
+			initSkyriseIntakeWithTeamColor(MHTeamColorRed);
+			break;
+		}
+		else if(nLCDButtons == MHLCDButtonRight){
+			initSkyriseIntakeWithTeamColor(MHTeamColorBlue);
+		}
+	}*/
 	bLCDBacklight = true;
 	clearLCD();
 	displayLCDCenteredString(0, "Autonomous?");
@@ -57,6 +88,11 @@ task autonomous(){
 	}
 	else{
 		runAutonomousForTeamColor(roundColor);
+		/*liftCubeForTime(MHTimeTenthSecond * 2, MHLiftDirectionDown);
+		int skyrisesToStack[5];
+		for(int i = 1; i <= 3; i++){
+			placeSkyrise(MHSkyriseForInt(i), roundColor);
+		}*/
 	}
 }
 task usercontrol(){
@@ -106,23 +142,11 @@ task usercontrol(){
 			SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
 		}
 		//Skyrise arm rotation
-		static bool skyriseArmShouldStall = false;
 		if(vexRT[Btn7R]){
 			motor[skyriseArm] = MHMotorPowerMax;
 		}
 		else if(vexRT[Btn7L]){
 			motor[skyriseArm] = -MHMotorPowerMax;
-		}
-		else if(vexRT[Btn7U]){
-			if(skyriseArmShouldStall){
-				skyriseArmShouldStall = false;
-			}
-			else{
-				skyriseArmShouldStall = true;
-			}
-		}
-		else if(skyriseArmShouldStall){
-			motor[skyriseArm] = MHMotorPowerStall;
 		}
 		else{
 			motor[skyriseArm] = MHMotorPowerStop;

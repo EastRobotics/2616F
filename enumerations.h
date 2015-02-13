@@ -76,6 +76,8 @@ typedef enum{
 	MHSkyriseFiveSkyrises = 2900,
 	MHSkyriseLiftInaccuracy = 400
 }MHSkyrise;
+//In a couple places, it's useful to have all of the above in an array, so they can be referenced by index, and not raw value
+static const MHSkyrise skyrises[5] = {MHSkyriseOneSkyrise, MHSkyriseTwoSkyrises, MHSkyriseThreeSkyrises, MHSkyriseFourSkyrises, MHSkyriseFiveSkyrises};
 typedef enum{
 	//These are all raw approximate potentiometer values, for use in the swingArmToSide fuction of autonomous.h
 	MHSkyriseArmRotationSideRightSide = 925,

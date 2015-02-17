@@ -95,6 +95,9 @@ void pre_auton(){
 	bLCDBacklight = false;*/
 }
 task autonomous(){
+	displayScreenStyle(MHLCDScreenStyleVoltage);
+	float startBattery = nImmediateBatteryLevel;
+	float startOther = SensorValue[otherBattery];
 	runAutonomousForTeamColor(roundColor);
 	if(skills){
 		if(roundColor == MHTeamColorRed || roundColor == MHTeamColorBlue){
@@ -148,23 +151,21 @@ task autonomous(){
 	basicDrive(MHMotorPowerMax, MHMotorPowerMax);
 	wait1Msec(MHTimeHalfSecond);
 	stopDrive();
+	if(startBattery != nImmediateBatteryLevel || startOther != SensorValue[otherBattery]){
+		displayLCDVoltageString(1);
+	}
 }
 task usercontrol(){
 	//Drive control
-	bLCDBacklight = true;
-	string first;
-	string second;
+	displayScreenStyle(MHLCDScreenStyleVoltage);
+	float startBattery = nImmediateBatteryLevel;
+	float startOther = SensorValue[otherBattery];
 	while(true){
-		if(nMotorEncoder[lbLift] < 0){
-			resetEncoders();
+		if(startBattery != nImmediateBatteryLevel || startOther != SensorValue[otherBattery]){
+			displayLCDVoltageString(1);
+			startBattery = nImmediateBatteryLevel;
+			startOther = SensorValue[otherBattery];
 		}
-		if(nLCDButtons != MHLCDButtonNone){
-			resetEncoders();
-		}
-		sprintf(first, "%d", nMotorEncoder[lbLift]);
-		sprintf(second, "%d", SensorValue[armAngle]);
-		//displayLCDCenteredString(0, first);
-		//displayLCDCenteredString(1, second);
 		if(abs(vexRT[Ch2]) <= 30){
 			stopDriveSide(MHRobotSideRight);
 		}

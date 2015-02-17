@@ -7,7 +7,7 @@ void LCDVoltageLine(string *line);
 void displayLCDVoltageString(int line){
 	bLCDBacklight = true;
 	clearLCDLine(line);
-	int otherBatteryLevel = (float)SensorValue[otherBattery] * 1000 / 280;
+	int otherBatteryLevel = /*(float)SensorValue[otherBattery] * 1000 / 280*/(float)SensorValue[otherBattery] / 1000;
 	displayVoltage(line, 0, nImmediateBatteryLevel, true);
 	displayVoltage(line, 11, otherBatteryLevel, false);
 }

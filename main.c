@@ -103,14 +103,7 @@ task autonomous(){
 				wallSide *= -1;
 			}
 			int skyriseBaseSide = -wallSide;
-			//Release the claw
-			liftCubeForTime(MHTimeTenthSecond * 2, MHLiftDirectionDown);
-			SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
-			//Grab the first skyrise
-			resetLift();
-			motor[skyriseArm] = MHMotorPowerHalf * wallSide;
-			wait1Msec(MHTimeOneSecond);
-			motor[skyriseArm] = MHMotorPowerStop;
+			//Grab the third skyrise
 			SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
 			wait1Msec(MHTimeOneSecond);
 			//Place the skyrise
@@ -155,6 +148,9 @@ task autonomous(){
 			motor[skyriseArm] = MHMotorPowerStop;
 		}
 	}
+	basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+	wait1Msec(MHTimeHalfSecond);
+	stopDrive();
 }
 task usercontrol(){
 	//Drive control

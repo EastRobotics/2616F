@@ -116,12 +116,12 @@ void screenForScreenStyle(MHLCDScreenStyle style, MHLCDScreen *screen){
 			screen->lastScreenStyle = MHLCDScreenStyleVoltage;
 			screen->nextScreenStyle = MHLCDScreenStyleColorSelection;
 			screen->backlight = true;
-			screen->header = "Points";
+			screen->header = "2616F";
 			screen->topLine = header;
-			screen->leftOption = "1";
-			screen->middleOption = "2";
-			screen->rightOption = "3";
-			screen->bottomLine = "1      2       3";
+			screen->leftOption = "Cube";
+			screen->middleOption = "Skill";
+			screen->rightOption = "Skyrs";
+			screen->bottomLine = "Cube Skill Skyrs";
 			screen->footer = screen->bottomLine;
 			break;
 		case MHLCDScreenStyleVoltage:
@@ -150,7 +150,7 @@ void screenForScreenStyle(MHLCDScreenStyle style, MHLCDScreen *screen){
 			screen->nextScreenStyle = MHLCDScreenStyleCustom;
 			screen->lastScreenStyle = MHLCDScreenStyleCustom;
 			screen->backlight = true;
-			screen->header = "";
+			screen->header = "2616F";
 			screen->topLine = "";
 			screen->footer = "";
 			screen->bottomLine = "";
@@ -159,7 +159,7 @@ void screenForScreenStyle(MHLCDScreenStyle style, MHLCDScreen *screen){
 			screen->nextScreenStyle = MHLCDScreenStyleCustom;
 			screen->lastScreenStyle = MHLCDScreenStyleCustom;
 			screen->backlight = true;
-			screen->header = "";
+			screen->header = "2616F";
 			screen->topLine = "";
 			screen->footer = "";
 			screen->bottomLine = "";
@@ -182,7 +182,10 @@ void clearLCD(){
 	clearLCDLine(1);
 }
 void displayNextScreen(){
-	if(nextScreen){
+	if(liveScreen.nextScreenStyle){
+		displayScreenStyle(liveScreen.nextScreenStyle);
+	}
+	else if(nextScreen){
 		displayScreen(nextScreen);
 	}
 }
@@ -208,19 +211,19 @@ void prepareScreen(MHLCDScreen *screen){
 	if(screen->header != ""){
 		screen->topLine = screen->header;
 	}
-	if(screen->footer != ""){
-		screen->bottomLine = screen->footer;
-	}
-	if(screen->rightOption != "" || screen->middleOption != "" || screen->leftOption != ""){
-		if(strlen(screen->rightOption) + strlen(screen->middleOption) + strlen(screen->leftOption) <= 16){
-			int space = MHLCDScreenWidth - strlen(screen->rightOption) + strlen(screen->leftOption);
-			//centerString(screen->middleOption, space);
-			sprintf(screen->bottomLine, "%s%s%s", screen->leftOption, screen->middleOption, screen->rightOption);
-		}
-		else{
-			screen->bottomLine = "Too many chars";
-		}
-	}
+	//if(screen->footer != ""){
+	//	screen->bottomLine = screen->footer;
+	//}
+	//if(screen->rightOption != "" || screen->middleOption != "" || screen->leftOption != ""){
+	//	if(strlen(screen->rightOption) + strlen(screen->middleOption) + strlen(screen->leftOption) <= 16){
+	//		int space = MHLCDScreenWidth - strlen(screen->rightOption) + strlen(screen->leftOption);
+	//		//centerString(screen->middleOption, space);
+	//		sprintf(screen->bottomLine, "%s%s%s", screen->leftOption, screen->middleOption, screen->rightOption);
+	//	}
+	//	else{
+	//		screen->bottomLine = "Too many chars";
+	//	}
+	//}
 }
 void print(const string lineOne, const string lineTwo){
 	clearLCDLine(0);
@@ -242,13 +245,14 @@ bool otherButtonsPressed(MHLCDButton button){
 }
 void waitForPress(){
 	while(nLCDButtons == MHLCDButtonNone){/*We just have to wait a while*/}
-	wait1Msec(50);
+	waitForRelease();
 }
 void waitForRelease(){
 	while(nLCDButtons != MHLCDButtonNone){/*We just have to wait a while*/}
 }
 void waitForPressOfButton(MHLCDButton button){
 	while(nLCDButtons != button){/*We just have to wait a while*/}
+	waitForRelease();
 }
 void flashScreen(MHLCDScreen screen){
 	displayScreen(screen);

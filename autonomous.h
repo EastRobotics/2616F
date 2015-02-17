@@ -371,23 +371,23 @@ void runAutonomousForTeamColor(MHTeamColor color){
 		//Grab the first skyrise
 		resetLift();
 		motor[skyriseArm] = MHMotorPowerHalf * wallSide;
-		wait1Msec(MHTimeHalfSecond);
+		wait1Msec(MHTimeOneSecond);
 		motor[skyriseArm] = MHMotorPowerStop;
 		SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
 		wait1Msec(MHTimeOneSecond);
 		//Place the skyrise
 		liftForEncoderDistance(MHSkyriseOneSkyrise, MHMotorPowerMax);
-		liftCubeForTime(MHTimeTenthSecond * 7, MHLiftDirectionDown);
+		liftCubeForTime(MHTimeHalfSecond, MHLiftDirectionDown);
 		motor[skyriseArm] = MHMotorPowerHalf * skyriseBaseSide;
 		wait1Msec(MHTimeOneSecond);
 		resetLift();
-		wait1Msec(MHTimeHalfSecond);
+		wait1Msec(MHTimeOneSecond);
 		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
 		//Grab the next skyrise
 		motor[skyriseArm] = MHMotorPowerHalf * wallSide;
 		wait1Msec(MHTimeOneSecond);
 		motor[skyriseArm] = MHMotorPowerStop;
-		wait1Msec(MHTimeHalfSecond);
+		wait1Msec(MHTimeOneSecond);
 		SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
 		//Place the skyrise
 		liftForEncoderDistance(MHSkyriseTwoSkyrises, MHMotorPowerMax);
@@ -395,20 +395,7 @@ void runAutonomousForTeamColor(MHTeamColor color){
 		wait1Msec(MHTimeOneSecond);
 		liftForEncoderDistance(MHSkyriseLiftInaccuracy, -MHMotorPowerMax);
 		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
-		//Grab the 3rd skyrise
-		resetLift();
-		motor[skyriseArm] = MHMotorPowerMax * wallSide;
-		wait1Msec(MHTimeOneSecond);
-		motor[skyriseArm] = MHMotorPowerStop;
-		SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
-		//Place the skyrise
-		liftForEncoderDistance(MHSkyriseThreeSkyrises, MHMotorPowerMax);
-		motor[skyriseArm] = MHMotorPowerHalf * skyriseBaseSide;
-		wait1Msec(MHTimeOneSecond);
-		liftForEncoderDistance(MHSkyriseLiftInaccuracy * 1.5, -MHMotorPowerMax);
-		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
 		//Reset the skyrise arm
-		resetLift();
 		motor[skyriseArm] = MHMotorPowerMax * wallSide;
 		wait1Msec(MHTimeOneSecond);
 		motor[skyriseArm] = MHMotorPowerStop;

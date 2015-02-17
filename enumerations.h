@@ -74,7 +74,7 @@ typedef enum{
 	MHSkyriseThreeSkyrises = 1500,
 	MHSkyriseFourSkyrises = 2000,
 	MHSkyriseFiveSkyrises = 2900,
-	MHSkyriseLiftInaccuracy = 400
+	MHSkyriseLiftInaccuracy = 200
 }MHSkyrise;
 //In a couple places, it's useful to have all of the above in an array, so they can be referenced by index, and not raw value
 static const MHSkyrise skyrises[5] = {MHSkyriseOneSkyrise, MHSkyriseTwoSkyrises, MHSkyriseThreeSkyrises, MHSkyriseFourSkyrises, MHSkyriseFiveSkyrises};

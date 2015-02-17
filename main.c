@@ -108,12 +108,11 @@ task autonomous(){
 			wait1Msec(MHTimeOneSecond);
 			//Place the skyrise
 			liftForEncoderDistance(MHSkyriseThreeSkyrises, MHMotorPowerMax);
-			liftCubeForTime(MHTimeHalfSecond, MHLiftDirectionDown);
 			motor[skyriseArm] = MHMotorPowerHalf * skyriseBaseSide;
 			wait1Msec(MHTimeOneSecond);
-			resetLift();
-			wait1Msec(MHTimeOneSecond);
+			liftForEncoderDistance(MHSkyriseLiftInaccuracy, -MHMotorPowerMax);
 			SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
+			resetLift();
 			//Grab the next skyrise
 			motor[skyriseArm] = MHMotorPowerHalf * wallSide;
 			wait1Msec(MHTimeOneSecond);
@@ -126,10 +125,7 @@ task autonomous(){
 			wait1Msec(MHTimeOneSecond);
 			liftForEncoderDistance(MHSkyriseLiftInaccuracy, -MHMotorPowerMax);
 			SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
-			//Reset the skyrise arm
-			motor[skyriseArm] = MHMotorPowerMax * wallSide;
-			wait1Msec(MHTimeOneSecond);
-			motor[skyriseArm] = MHMotorPowerStop;
+			resetLift();
 			//Grab the next skyrise
 			motor[skyriseArm] = MHMotorPowerHalf * wallSide;
 			wait1Msec(MHTimeOneSecond);
@@ -142,6 +138,7 @@ task autonomous(){
 			wait1Msec(MHTimeOneSecond);
 			liftForEncoderDistance(MHSkyriseLiftInaccuracy, -MHMotorPowerMax);
 			SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
+			resetLift();
 			//Reset the skyrise arm
 			motor[skyriseArm] = MHMotorPowerMax * wallSide;
 			wait1Msec(MHTimeOneSecond);

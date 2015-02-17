@@ -96,6 +96,7 @@ void pre_auton(){
 }
 task autonomous(){
 	displayScreenStyle(MHLCDScreenStyleVoltage);
+	bLCDBacklight = false;
 	float startBattery = nImmediateBatteryLevel;
 	float startOther = SensorValue[otherBattery];
 	runAutonomousForTeamColor(roundColor);
@@ -158,6 +159,7 @@ task autonomous(){
 task usercontrol(){
 	//Drive control
 	displayScreenStyle(MHLCDScreenStyleVoltage);
+	bLCDBacklight = false;
 	float startBattery = nImmediateBatteryLevel;
 	float startOther = SensorValue[otherBattery];
 	while(true){

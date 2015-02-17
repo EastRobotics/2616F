@@ -173,7 +173,12 @@ void displayScreen(MHLCDScreen screen){
 	lastScreen = liveScreen;
 	bLCDBacklight = screen.backlight;
 	displayLCDCenteredString(0, screen.topLine);
-	displayLCDCenteredString(1, screen.bottomLine);
+	if(screen.style == MHLCDScreenStyleVoltage){
+		displayLCDVoltageString(1);
+	}
+	else{
+		displayLCDCenteredString(1, screen.bottomLine);
+	}
 	liveScreen = screen;
 	screenForScreenStyle(screen.nextScreenStyle, &nextScreen);
 }
@@ -268,4 +273,8 @@ void displayScreenStyle(MHLCDScreenStyle style){
 	MHLCDScreen screen;
 	screenForScreenStyle(style, &screen);
 	displayScreen(screen);
+	if(style == MHLCDScreenStyleVoltage){
+		bLCDBacklight = false;
+		displayLCDVoltageString(1);
+	}
 }

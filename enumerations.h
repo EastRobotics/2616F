@@ -24,21 +24,13 @@ typedef enum{
 }MHTeamColor;
 //All the possible point values that the robot can score during the autonomous task. Chosen in the pre_auton function
 typedef enum{
-	MHAutonPointValue3 = 3,
-	MHAutonPointValue5 = 5,
+	MHAutonStyleOnePoint = 1,
+	MHAutonStyleCubeAuton = 3,
+	MHAutonStyleSkyriseAuton = 12,
+	MHAutonStyleSkills = 30,
 	//MHAutonValueNone is bridged toll-free to MHTeamColorNone, since they're the same thing
-	MHAutonPointValueNone = MHTeamColorNone
-}MHAutonPointValue;
-//Easy reference to the types of automomous modes our robot can handle
-typedef enum{
-	MHAutonModeBlue3 = MHTeamColorBlue * MHAutonPointValue3,
-	MHAutonModeBlue5 = MHTeamColorBlue * MHAutonPointValue5,
-	MHAutonModeRed3 = MHTeamColorRed * MHAutonPointValue3,
-	MHAutonModeRed5 = MHTeamColorRed * MHAutonPointValue5,
-	//MHAutonModeNoAuton is bridged toll-free to MHAutonValueNone, because they're the same thing
-	MHAutonModeNoAuton = MHAutonPointValueNone,
-	MHAutonModeNoneSelected
-}MHAutonMode;
+	MHAutonStyleNoAuton = MHTeamColorNone
+}MHAutonStyle;
 //typedef to frequently used amounts of time
 typedef enum{
 	MHTimeOneMillisecond = 1,

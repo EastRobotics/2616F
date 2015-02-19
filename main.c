@@ -24,8 +24,7 @@
 #include "enumerations.h"
 #include "autonomous.h"
 #include "lcd.h"
-bool skills = false;
-bool skyrise;
+MHAutonStyle roundAuton = MHAutonStyleNoAuton;
 void pre_auton(){
 	displayScreenStyle(MHLCDScreenStyleVoltage);
 	waitForPressOfButton(MHLCDButtonCenter);
@@ -36,26 +35,27 @@ void pre_auton(){
 		if(nLCDButtons == MHLCDButtonLeft){
 			//Cube auton chosen
 			waitForRelease();
-			skyrise = false;
+			roundAuton = MHAutonStyleCubeAuton;
+			initSkyriseIntakeWithTeamColor(MHTeamColorRed);
 			break;
 		}
 		else if(nLCDButtons == MHLCDButtonCenter){
 			//Time for programminng skills
 			waitForRelease();
 			initSkyriseIntakeWithTeamColor(MHTeamColorRed);
-			skills = true;
+			roundAuton = MHAutonStyleSkills;
 			displayScreenStyle(MHLCDScreenStyleVoltage);
 			break;
 		}
 		else if(nLCDButtons == MHLCDButtonRight){
 			//Skyrise auton chosen
 			waitForRelease();
-			skyrise = true;
+			roundAuton = MHAutonStyleSkyriseAuton;
 			break;
 		}
 	}
 	//If it's not the skills, we continue
-	if(!skills){
+	if(roundAuton != MHAutonStyleSkills && roundAuton != MHAutonStyleCubeAuton){
 		displayLCDCenteredString(1, "Red         Blue");
 		while(true){
 			if(nLCDButtons == MHLCDButtonLeft){
@@ -72,86 +72,27 @@ void pre_auton(){
 			}
 		}
 	}
-	/*bLCDBacklight = true;
-	clearLCD();
-	displayLCDCenteredString(0, "Autonomous?");
-	displayLCDCenteredString(1, "Red    1    Blue");
-	while(true){
-		if(nLCDButtons == MHLCDButtonLeft){
-			initSkyriseIntakeWithTeamColor(MHTeamColorRed);
-			break;
-		}
-		else if(nLCDButtons == MHLCDButtonRight){
-			initSkyriseIntakeWithTeamColor(MHTeamColorBlue);
-			break;
-		}
-		else if(nLCDButtons == MHLCDButtonCenter){
-			skills = true;
-			initSkyriseIntakeWithTeamColor(MHTeamColorBlue);
-			break;
+	//If it's the cube auton, we ask if we want a 3 or 1 point
+	if(roundAuton == MHAutonStyleCubeAuton){
+		displayLCDCenteredString(1, "3              1");
+		while(true){
+			if(nLCDButtons == MHLCDButtonRight){
+				roundAuton = MHAutonStyleOnePoint;
+				break;
+			}
+			else if(nLCDButtons == MHLCDButtonLeft){
+				break;
+			}
 		}
 	}
-	clearLCD();
-	bLCDBacklight = false;*/
 }
 task autonomous(){
 	displayScreenStyle(MHLCDScreenStyleVoltage);
 	bLCDBacklight = false;
 	float startBattery = nImmediateBatteryLevel;
 	float startOther = SensorValue[otherBattery];
-	runAutonomousForTeamColor(roundColor);
-	if(skills){
-		if(roundColor == MHTeamColorRed || roundColor == MHTeamColorBlue){
-			int wallSide = 1;
-			if(roundColor == MHTeamColorBlue){
-				wallSide *= -1;
-			}
-			int skyriseBaseSide = -wallSide;
-			//Grab the third skyrise
-			SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
-			wait1Msec(MHTimeOneSecond);
-			//Place the skyrise
-			liftForEncoderDistance(MHSkyriseThreeSkyrises, MHMotorPowerMax);
-			motor[skyriseArm] = MHMotorPowerHalf * skyriseBaseSide;
-			wait1Msec(MHTimeOneSecond);
-			liftForEncoderDistance(MHSkyriseLiftInaccuracy, -MHMotorPowerMax);
-			SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
-			resetLift();
-			//Grab the next skyrise
-			motor[skyriseArm] = MHMotorPowerHalf * wallSide;
-			wait1Msec(MHTimeOneSecond);
-			motor[skyriseArm] = MHMotorPowerStop;
-			wait1Msec(MHTimeOneSecond);
-			SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
-			//Place the skyrise
-			liftForEncoderDistance(MHSkyriseFourSkyrises, MHMotorPowerMax);
-			motor[skyriseArm] = MHMotorPowerHalf * skyriseBaseSide;
-			wait1Msec(MHTimeOneSecond);
-			liftForEncoderDistance(MHSkyriseLiftInaccuracy, -MHMotorPowerMax);
-			SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
-			resetLift();
-			//Grab the next skyrise
-			motor[skyriseArm] = MHMotorPowerHalf * wallSide;
-			wait1Msec(MHTimeOneSecond);
-			motor[skyriseArm] = MHMotorPowerStop;
-			wait1Msec(MHTimeOneSecond);
-			SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
-			//Place the skyrise
-			liftForEncoderDistance(MHSkyriseFiveSkyrises, MHMotorPowerMax);
-			motor[skyriseArm] = MHMotorPowerHalf * skyriseBaseSide;
-			wait1Msec(MHTimeOneSecond);
-			liftForEncoderDistance(MHSkyriseLiftInaccuracy, -MHMotorPowerMax);
-			SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
-			resetLift();
-			//Reset the skyrise arm
-			motor[skyriseArm] = MHMotorPowerMax * wallSide;
-			wait1Msec(MHTimeOneSecond);
-			motor[skyriseArm] = MHMotorPowerStop;
-		}
-	}
-	basicDrive(MHMotorPowerMax, MHMotorPowerMax);
-	wait1Msec(MHTimeHalfSecond);
-	stopDrive();
+	//Auton running here
+	runAutonomousStyleForTeamColor(roundColor, roundAuton);
 	if(startBattery != nImmediateBatteryLevel || startOther != SensorValue[otherBattery]){
 		displayLCDVoltageString(1);
 	}

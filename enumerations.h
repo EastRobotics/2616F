@@ -61,12 +61,12 @@ typedef enum{
 }MHPneumaticPosition;
 typedef enum{
 	//These all are raw approximate encoder count values, for use in the liftForEncoderDistance function of autonomous.h
-	MHSkyriseOneSkyrise = 700,
-	MHSkyriseTwoSkyrises = 900,
-	MHSkyriseThreeSkyrises = 1500,
-	MHSkyriseFourSkyrises = 2000,
-	MHSkyriseFiveSkyrises = 2900,
-	MHSkyriseLiftInaccuracy = 200
+	MHSkyriseOneSkyrise = 900,
+	MHSkyriseTwoSkyrises = 1100,
+	MHSkyriseThreeSkyrises = 1700,
+	MHSkyriseFourSkyrises = 2200,
+	MHSkyriseFiveSkyrises = 3100,
+	MHSkyriseLiftInaccuracy = 400
 }MHSkyrise;
 //In a couple places, it's useful to have all of the above in an array, so they can be referenced by index, and not raw value
 static const MHSkyrise skyrises[5] = {MHSkyriseOneSkyrise, MHSkyriseTwoSkyrises, MHSkyriseThreeSkyrises, MHSkyriseFourSkyrises, MHSkyriseFiveSkyrises};

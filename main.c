@@ -99,6 +99,7 @@ task autonomous(){
 }
 task usercontrol(){
 	//Drive control
+	bool hasFixedAuton = false;
 	displayScreenStyle(MHLCDScreenStyleVoltage);
 	bLCDBacklight = false;
 	float startBattery = nImmediateBatteryLevel;
@@ -158,6 +159,13 @@ task usercontrol(){
 		}
 		else{
 			liftCube(MHLiftDirectionStop);
+		}
+		//Auton fixer
+		if(vexRT[Btn7U] && !hasFixedAuton){
+			hasFixedAuton = true;
+			basicDrive(-MHMotorPowerMax, -MHMotorPowerMax);
+			wait1Msec(MHTimeTenthSecond * 2);
+			stopDrive();
 		}
 	}
 }

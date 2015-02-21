@@ -23,7 +23,10 @@
 #include "Vex_Competition_Includes.h"
 #include "enumerations.h"
 #include "autonomous.h"
+#ifndef LCD
+//This file depends on lcd.h, but some other #includes might, too
 #include "lcd.h"
+#endif
 MHAutonStyle roundAuton = MHAutonStyleNoAuton;
 void pre_auton(){
 	displayScreenStyle(MHLCDScreenStyleVoltage);

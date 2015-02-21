@@ -3,6 +3,10 @@
 //This file depends on enumerations.h
 #include "enumerations.h"
 #endif
+#ifndef LCD
+//This file also depends on lcd.h
+#include "lcd.h"
+#endif
 MHSkyriseArmRotationSide skyriseSide;
 MHTeamColor roundColor;
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -423,34 +427,24 @@ void runAutonomousStyleForTeamColor(MHTeamColor color, MHAutonStyle auton){
 		liftForEncoderDistance(MHSkyriseLiftInaccuracy * 2, -MHMotorPowerMax);
 		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
 		liftForEncoderDistance(diff, -MHMotorPowerMax);
-		//Grab the next skyrise
-		motor[skyriseArm] = MHMotorPowerHalf * wallSide;
-		wait1Msec(MHTimeOneSecond * 2);
-		SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
-		//Place the skyrise
-		liftForEncoderDistance(MHSkyriseFourSkyrises * 3, MHMotorPowerMax);
-		motor[skyriseArm] = MHMotorPowerHalf * skyriseBaseSide;
-		wait1Msec(MHTimeOneSecond);
-		diff = nMotorEncoder[lbLift] - MHSkyriseLiftInaccuracy;
-		liftForEncoderDistance(MHSkyriseLiftInaccuracy, -MHMotorPowerMax);
-		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
-		liftForEncoderDistance(diff, -MHMotorPowerMax);
-		//Grab the next skyrise
-		motor[skyriseArm] = MHMotorPowerHalf * wallSide;
-		wait1Msec(MHTimeOneSecond * 2);
-		SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
-		//Place the skyrise
-		liftForEncoderDistance(MHSkyriseFiveSkyrises * 3, MHMotorPowerMax);
-		motor[skyriseArm] = MHMotorPowerHalf * skyriseBaseSide;
-		wait1Msec(MHTimeOneSecond);
-		diff = nMotorEncoder[lbLift] - MHSkyriseLiftInaccuracy;
-		liftForEncoderDistance(MHSkyriseLiftInaccuracy, -MHMotorPowerMax);
-		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
-		liftForEncoderDistance(diff, -MHMotorPowerMax);
-		//Reset the skyrise arm
-		motor[skyriseArm] = MHMotorPowerMax * wallSide;
-		wait1Msec(MHTimeOneSecond);
-		motor[skyriseArm] = MHMotorPowerStop;
+		//Count down for 5 seconds
+		countDownForTime(MHTimeOneSecond * 5);
+		//Drive forward to push stuff
+		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+		wait1Msec(MHTimeOneSecond * 5);
+		//Return to the starting tile
+		basicDrive(-MHMotorPowerMax, -MHMotorPowerMax);
+		wait1Msec(MHTimeOneSecond * 6);
+		stopDrive();
+		//Give some time to reposition
+		countDownForTime(MHTimeOneSecond * 5);
+		//Drive forward one last time
+		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+		wait1Msec(MHTimeOneSecond * 5);
+		//Retreat a little so as not to lose points
+		basicDrive(-MHMotorPowerMax, -MHMotorPowerMax);
+		wait1Msec(MHTimeOneSecond + MHTimeHalfSecond);
+		stopDrive();
 	}
 	if(shouldClear){
 		basicDrive(MHMotorPowerMax, MHMotorPowerMax);

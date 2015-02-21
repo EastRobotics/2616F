@@ -3,6 +3,9 @@
 #ifndef VOLTAGE_THRESHOLD
 #include "battery.h"
 #endif
+#ifndef LCD
+#define LCD
+#endif
 //Different default screen types, used by the displayScreen function in lcd.h to display a preconfigured screen
 typedef enum{
 	MHLCDScreenStyleColorSelection = 1,
@@ -70,6 +73,8 @@ void waitForRelease();
 void flashScreen(MHLCDScreen screen);
 //Displays a screen style for 5 seconds, then switches back to the previous
 void flashScreenStyle(MHLCDScreenStyle screenStyle);
+//Waits for a specified amount of time (in seconds) while counting down the time on the LCD
+void countDownForTime(MHTime time);
 /*
 void centerString(string *original, int area){
 	string text = (string)*original;
@@ -277,4 +282,15 @@ void displayScreenStyle(MHLCDScreenStyle style){
 		bLCDBacklight = false;
 		displayLCDVoltageString(1);
 	}
+}
+void countDownForTime(MHTime time){
+	bool startState = bLCDBacklight;
+	bLCDBacklight = true;
+	for(int i = (int)(time/MHTimeOneSecond); i > 0; i++){
+		string number;
+		sprintf(number, "%d", i);
+		displayLCDCenteredString(1, number);
+		wait1Msec(MHTimeOneSecond);
+	}
+	bLCDBacklight = startState;
 }

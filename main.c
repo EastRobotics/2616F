@@ -4,7 +4,7 @@
 #pragma config(Sensor, in7,    lLiftPotentiometer, sensorPotentiometer)
 #pragma config(Sensor, in8,    rLiftPotentiometer, sensorPotentiometer)
 #pragma config(Sensor, dgtl1,  cubeIntake,     sensorDigitalOut)
-#pragma config(Sensor, dgtl12, skyriseClaw,    sensorDigitalOut)
+#pragma config(Sensor, dgtl2,  skyriseClaw,    sensorDigitalOut)
 #pragma config(Sensor, I2C_1,  ,               sensorQuadEncoderOnI2CPort,    , AutoAssign)
 #pragma config(Sensor, I2C_2,  ,               sensorQuadEncoderOnI2CPort,    , AutoAssign)
 #pragma config(Motor,  port1,           rbLift,        tmotorVex393_HBridge, openLoop, reversed)
@@ -149,6 +149,10 @@ task usercontrol(){
 		//Skyrise Intake
 		if(vexRT[Btn8D]){
 			SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
+			time = MHTimeOneSecond * 2;
+			if(!skyriseResetTaskRunning){
+				startTask(resetSkyriseIntake);
+			}
 		}
 		else if(vexRT[Btn8R]){
 			SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
@@ -157,14 +161,10 @@ task usercontrol(){
 			resetEncoders();
 		}
 		if(vexRT[Btn7R]){
-			SensorValue[cubeIntake] = MHPneumaticPositionOpen;
-			time = MHTimeOneSecond * 2;
-			if(!skyriseResetTaskRunning){
-				startTask(resetSkyriseIntake, 1);
-			}
+			SensorValue[cubeIntake] = MHPneumaticPositionClosed;
 		}
 		else if(vexRT[Btn7D]){
-			SensorValue[cubeIntake] = MHPneumaticPositionClosed;
+			SensorValue[cubeIntake] = MHPneumaticPositionOpen;
 		}
 		else if(vexRT[Btn7U]){
 			if(shouldToggle){

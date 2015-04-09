@@ -345,3 +345,15 @@ void runAutonomousStyleForTeamColor(MHTeamColor color, MHAutonStyle auton){
 	}
 	shouldClear = true;
 }
+int time = 0;
+bool skyriseResetTaskRunning = false;
+task resetSkyriseIntake(){
+	skyriseResetTaskRunning = true;
+	while(time > 0){
+		wait1Msec(MHTimeOneMillisecond);
+		time--;
+	}
+	SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
+	skyriseResetTaskRunning = false;
+	stopTask(resetSkyriseIntake);
+}

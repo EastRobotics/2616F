@@ -60,8 +60,11 @@ typedef enum{
 	MHPneumaticPositionOpen = 0
 }MHPneumaticPosition;
 typedef enum{
-	//These all are raw approximate encoder count values, for use in the liftForEncoderDistance function of autonomous.h
-	MHSkyriseOneSkyrise = 900,
+	//These all are raw approximate postentiometer values, for use in the liftToPosition function of autonomous.h
+	MHSkyriseOneSkyrise = 1200,
+
+	//TODO: Update to potentiometer values
+
 	MHSkyriseTwoSkyrises = 1100,
 	MHSkyriseThreeSkyrises = 1700,
 	MHSkyriseFourSkyrises = 2200,
@@ -82,7 +85,8 @@ typedef enum{
 	MHLiftPositionTop = 0,
 	MHLiftPositionMiddlePost = 800,
 	MHLiftPositionLowPost = 1100,
-	MHLiftPositionBottom = 1620
+	MHLiftPositionOneCube = 1300,
+	MHLiftPositionBottom = 1600
 }MHLiftPosition;
 //Constants to define positions for the turning gyroscope
 typedef enum{

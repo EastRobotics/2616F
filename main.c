@@ -79,7 +79,7 @@ void pre_auton(){
 	}
 	//If it's the cube auton, we ask if we want a 3 or 1 point
 	if(roundAuton == MHAutonStyleCubeAuton){
-		displayLCDCenteredString(1, "Red          Blue");
+		displayLCDCenteredString(1, "Red         Blue");
 		while(true){
 			if(nLCDButtons == MHLCDButtonRight){
 				waitForRelease();
@@ -107,8 +107,7 @@ task autonomous(){
 	float startBattery = nImmediateBatteryLevel;
 	float startOther = SensorValue[otherBattery];
 	//Auton running here
-	//runAutonomousStyleForTeamColor(roundColor, roundAuton);
-	liftToPosition(MHLiftPositionBottom / 2);
+	runAutonomousStyleForTeamColor(roundColor, roundAuton);
 	if(startBattery != nImmediateBatteryLevel || startOther != SensorValue[otherBattery]){
 		displayLCDVoltageString(1);
 	}
@@ -127,12 +126,9 @@ task usercontrol(){
 			startBattery = nImmediateBatteryLevel;
 			startOther = SensorValue[otherBattery];
 		}
-		//string top;
-		//string bottom;
-		//sprintf(top, "%d", SensorValue[turningGyro]);
-		//sprintf(bottom, "%d", SensorValue[rLiftPotentiometer]);
-		//displayLCDCenteredString(0, top);
-		//displayLCDCenteredString(1, bottom);
+		string top;
+		sprintf(top, "%d", SensorValue[turningGyro]);
+		displayLCDCenteredString(0, top);
 		if(abs(vexRT[Ch2]) <= 30){
 			stopDriveSide(MHRobotSideRight);
 		}
@@ -163,15 +159,11 @@ task usercontrol(){
 		else if(vexRT[Btn8R]){
 			SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
 		}
-		if(vexRT[Btn5U] || vexRT[Btn5D]){
-			resetEncoders();
-		}
 		else if(vexRT[Btn7D]){
 			SensorValue[cubeIntake] = MHPneumaticPositionOpen;
-			time = MHTimeOneSecond * 2;
-			if(!cubeResetTaskRunning){
-				startTask(resetCubeIntake);
-			}
+		}
+		else if(vexRT[Btn7R]){
+			SensorValue[cubeIntake] = MHPneumaticPositionClosed;
 		}
 		else if(vexRT[Btn7U]){
 			if(shouldToggle){
@@ -182,10 +174,5 @@ task usercontrol(){
 		if(!vexRT[Btn7U]){
 			shouldToggle = true;
 		}
-		//Auton fixer
-		//if(vexRT[Btn7U]){
-		//	frontDirection *= -1;
-		//}
-		abortTimeslice();
 	}
 }

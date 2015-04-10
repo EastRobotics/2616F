@@ -229,15 +229,8 @@ void liftToPositionWithPower(int value, int power){
 	}
 	displayLCDCenteredString(0, "Lifting...");
 	while(SensorValue[rLiftPotentiometer] != value){
-		//Protect if things have changed since the potentiometer was last checked
-		if(liftDirection == MHLiftDirectionStop){
-			break;
-		}
-		else{
-			lift(power, liftDirection);
-		}
+		lift(power, liftDirection);
 	}
-	displayLCDCenteredString(1, "Done Lifting");
 	lift(MHMotorPowerStop, MHLiftDirectionStop);
 }
 void liftToPosition(int value){
@@ -333,9 +326,14 @@ void rotateDistanceInDirectionWithPower(int distance, MHRotationDirection direct
 	while(abs(SensorValue[turningGyro]) < distance){
 		rotate(power, direction);
 	}
+	stopDrive();
 	SensorFullCount[turningGyro] = MHRotationDistanceFullTurn;
 }
 void rotateDistanceInDirection(int distance, MHRotationDirection direction){
+	int correction = MHRotationDistanceTenDegrees * 1.5;
+	if(distance > correction){
+		distance -= correction;
+	}
 	rotateDistanceInDirectionWithPower(distance, direction, MHMotorPowerMax);
 }
 //This *MUST* be called before an auton is run
@@ -350,7 +348,7 @@ void initAutonomousWithTeamColor(MHTeamColor color){
 	}
 }
 void runAutonomousStyleForTeamColor(MHTeamColor color, MHAutonStyle auton){
-	SensorValue[cubeIntake] = MHPneumaticPositionClosed;
+	SensorValue[cubeIntake] = MHPneumaticPositionOpen;
 	if(auton == MHAutonStyleCubeAuton){
 		MHRotationDirection spinDirection;
 		if(color == MHTeamColorRed){
@@ -364,37 +362,45 @@ void runAutonomousStyleForTeamColor(MHTeamColor color, MHAutonStyle auton){
 		}
 		liftToPosition(MHLiftPositionLowPost);
 		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
-		wait1Msec(MHTimeOneSecond);
+		wait1Msec(MHTimeHalfSecond - 25);
 		stopDrive();
 		resetLift();
+		wait1Msec(MHTimeTenthSecond);
+		liftToPosition(MHLiftPositionBottom - 10);
+		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+		wait1Msec(MHTimeHalfSecond + MHTimeQuarterSecond);
+		stopDrive();
 		liftToPosition(MHLiftPositionTop);
 		rotateDistanceInDirection(MHRotationDistanceQuarterRotation, spinDirection);
 		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
 		wait1Msec(MHTimeHalfSecond);
 		stopDrive();
 		wait1Msec(MHTimeHalfSecond);
-		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
-		wait1Msec(MHTimeTenthSecond * 2);
-		stopDrive();
+		//basicDrive(-MHMotorPowerMax, -MHMotorPowerMax);
+		//wait1Msec(MHTimeTenthSecond * 1.5);
+		//stopDrive();
 		liftToPosition(MHLiftPositionMiddlePost);
-		SensorValue[cubeIntake] = MHPneumaticPositionOpen;
+		SensorValue[cubeIntake] = MHPneumaticPositionClosed;
 		wait1Msec(MHTimeHalfSecond);
 		liftToPosition(MHLiftPositionTop);
 		basicDrive((-100), (-100));
-		wait1Msec(MHTimeOneSecond + MHTimeHalfSecond);
+		wait1Msec(MHTimeHalfSecond);
 		stopDrive();
 		liftToPosition(MHLiftPositionBottom);
+		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
+		SensorValue[cubeIntake] = MHPneumaticPositionOpen;
 	}
-}
-int time = 0;
-bool cubeResetTaskRunning = false;
-task resetCubeIntake(){
-	cubeResetTaskRunning = true;
-	while(time > 0){
-		wait1Msec(MHTimeOneMillisecond);
-		time--;
+	else if(auton == MHAutonStyleSkyriseAuton){
+		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
+		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+		wait1Msec(MHTimeTenthSecond);
+		stopDrive();
+		wait1Msec(MHTimeHalfSecond);
+		SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
+		liftToPosition(MHSkyriseOneSkyrise);
+		wait1Msec(MHTimeHalfSecond);
+		rotateDistanceInDirection(MHRotationDistanceQuarterRotation / 2, MHRotationDirectionCounterClockwise);
+		resetLift();
+		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
 	}
-	SensorValue[cubeIntake] = MHPneumaticPositionClosed;
-	cubeResetTaskRunning = false;
-	stopTask(resetCubeIntake);
 }

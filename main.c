@@ -42,7 +42,6 @@ void pre_auton(){
 			//Cube auton chosen
 			waitForRelease();
 			roundAuton = MHAutonStyleCubeAuton;
-			initAutonomousWithTeamColor(MHTeamColorRed);
 			break;
 		}
 		else if(nLCDButtons == MHLCDButtonCenter){
@@ -80,13 +79,16 @@ void pre_auton(){
 	}
 	//If it's the cube auton, we ask if we want a 3 or 1 point
 	if(roundAuton == MHAutonStyleCubeAuton){
-		displayLCDCenteredString(1, "3              1");
+		displayLCDCenteredString(1, "Red          Blue");
 		while(true){
 			if(nLCDButtons == MHLCDButtonRight){
-				roundAuton = MHAutonStyleOnePoint;
+				waitForRelease();
+				initAutonomousWithTeamColor(MHTeamColorBlue);
 				break;
 			}
 			else if(nLCDButtons == MHLCDButtonLeft){
+				waitForRelease();
+				initAutonomousWithTeamColor(MHTeamColorRed);
 				break;
 			}
 		}
@@ -157,10 +159,6 @@ task usercontrol(){
 		//Skyrise Intake
 		if(vexRT[Btn8D]){
 			SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
-			time = MHTimeOneSecond * 2;
-			if(!skyriseResetTaskRunning){
-				startTask(resetSkyriseIntake);
-			}
 		}
 		else if(vexRT[Btn8R]){
 			SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
@@ -168,11 +166,12 @@ task usercontrol(){
 		if(vexRT[Btn5U] || vexRT[Btn5D]){
 			resetEncoders();
 		}
-		if(vexRT[Btn7R]){
-			SensorValue[cubeIntake] = MHPneumaticPositionClosed;
-		}
 		else if(vexRT[Btn7D]){
 			SensorValue[cubeIntake] = MHPneumaticPositionOpen;
+			time = MHTimeOneSecond * 2;
+			if(!cubeResetTaskRunning){
+				startTask(resetCubeIntake);
+			}
 		}
 		else if(vexRT[Btn7U]){
 			if(shouldToggle){

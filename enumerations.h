@@ -80,6 +80,7 @@ typedef enum{
 typedef enum{
 	MHLiftPositionCurrentPosition = (-1),
 	MHLiftPositionTop = 0,
+	MHLiftPositionMiddlePost = 800,
 	MHLiftPositionLowPost = 1100,
 	MHLiftPositionBottom = 1620
 }MHLiftPosition;

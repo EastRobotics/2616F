@@ -78,6 +78,7 @@ typedef enum{
 }MHRotationDirection;
 //Constants to define different signifcant points in the lift in potentiometer values
 typedef enum{
+	MHLiftPositionCurrentPosition = (-1),
 	MHLiftPositionTop = 0,
 	MHLiftPositionLowPost = 1100,
 	MHLiftPositionBottom = 1620

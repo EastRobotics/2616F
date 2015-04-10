@@ -199,10 +199,6 @@ void liftForEncoderDistance(int count, int power){
 	string first;
 	string second;
 	while((abs(nMotorEncoder[lmLift]) + abs(nMotorEncoder[rbLift])) / 2 < count){
-		sprintf(first, "%d", abs(nMotorEncoder[lmLift]));
-		sprintf(second, "%d", abs(nMotorEncoder[rbLift]));
-		displayLCDCenteredString(0, first);
-		displayLCDCenteredString(1, second);
 		if(power > 0){
 			lift(power, MHLiftDirectionUp);
 		}
@@ -218,6 +214,9 @@ void liftForEncoderDistance(int count, int power){
 }
 void liftToPositionWithPower(int value, int power){
 	//Up is negative, down is positive
+	if(value == (int)MHLiftPositionCurrentPosition){
+		value = SensorValue[rLiftPotentiometer];
+	}
 	MHLiftDirection liftDirection;
 	if(value > SensorValue[rLiftPotentiometer]){
 		liftDirection = MHLiftDirectionDown;
@@ -228,13 +227,7 @@ void liftToPositionWithPower(int value, int power){
 	else{
 		liftDirection = MHLiftDirectionStop;
 	}
-	string top;
-	string bottom;
-	sprintf(top, "%d", value);
-	displayLCDCenteredString(0, top);
 	while(SensorValue[rLiftPotentiometer] != value){
-		sprintf(bottom, "%d", SensorValue[rLiftPotentiometer]);
-		displayLCDCenteredString(1, bottom);
 		//Protect if things have changed since the potentiometer was last checked
 		if(liftDirection == MHLiftDirectionStop){
 			lift(MHMotorPowerStop, liftDirection);
@@ -250,6 +243,22 @@ void liftToPosition(int value){
 }
 void resetLift(){
 	liftToPosition(MHLiftPositionBottom);
+}
+void liftForPotentiometerDistanceInDirectionWithPower(int distance, MHLiftDirection direction, int power){
+	int position = MHLiftPositionCurrentPosition;
+	if(direction == MHLiftDirectionUp && SensorValue[rLiftPotentiometer] - distance < (int)MHLiftPositionTop){
+		position = MHLiftPositionTop;
+	}
+	else if(direction == MHLiftDirectionDown && SensorValue[rLiftPotentiometer] + distance > (int)MHLiftPositionBottom){
+		position = MHLiftPositionBottom;
+	}
+	else{
+		position = SensorValue[rLiftPotentiometer] + (distance * direction);
+	}
+	liftToPositionWithPower(position, power);
+}
+void liftForPotentiometerDistanceInDirection(int distance, MHLiftDirection direction){
+	liftForPotentiometerDistanceInDirectionWithPower(distance, direction, MHMotorPowerMax);
 }
 void liftCube(MHLiftDirection direction){
 	motor[cubeIntake] = MHMotorPowerMax * direction;

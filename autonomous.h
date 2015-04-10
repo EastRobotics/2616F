@@ -7,7 +7,7 @@
 //This file also depends on lcd.h
 #include "lcd.h"
 #endif
-MHSkyriseArmRotationSide skyriseSide;
+MHRotationDirection initialSkyriseRotationDirection;
 MHTeamColor roundColor;
 /////////////////////////////////////////////////////////////////////////////////////////
 //**Reset encoders**/
@@ -216,8 +216,40 @@ void liftForEncoderDistance(int count, int power){
 	}
 	lift(MHMotorPowerStop, MHLiftDirectionStop);
 }
+void liftToPositionWithPower(int value, int power){
+	//Up is negative, down is positive
+	MHLiftDirection liftDirection;
+	if(value > SensorValue[rLiftPotentiometer]){
+		liftDirection = MHLiftDirectionDown;
+	}
+	else if(value < SensorValue[rLiftPotentiometer]){
+		liftDirection = MHLiftDirectionUp;
+	}
+	else{
+		liftDirection = MHLiftDirectionStop;
+	}
+	string top;
+	string bottom;
+	sprintf(top, "%d", value);
+	displayLCDCenteredString(0, top);
+	while(SensorValue[rLiftPotentiometer] != value){
+		sprintf(bottom, "%d", SensorValue[rLiftPotentiometer]);
+		displayLCDCenteredString(1, bottom);
+		//Protect if things have changed since the potentiometer was last checked
+		if(liftDirection == MHLiftDirectionStop){
+			lift(MHMotorPowerStop, liftDirection);
+		}
+		else{
+			lift(power, liftDirection);
+		}
+	}
+	lift(MHMotorPowerStop, MHLiftDirectionStop);
+}
+void liftToPosition(int value){
+	liftToPositionWithPower(value, MHMotorPowerMax);
+}
 void resetLift(){
-	liftForEncoderDistance(nMotorEncoder[lmLift], -MHMotorPowerMax);
+	liftToPosition(MHLiftPositionBottom);
 }
 void liftCube(MHLiftDirection direction){
 	motor[cubeIntake] = MHMotorPowerMax * direction;
@@ -243,107 +275,80 @@ int intForMHSkyrise(MHSkyrise skyrise){
 	}
 	return NULL;
 }
+int trueNorth = 0;
+void resetGyro(){
+	trueNorth += (trueNorth - SensorValue[turningGyro]);
+	SensorValue[turningGyro] = 0;
+}
+void rotate(int power, MHRotationDirection direction){
+	basicDrive(power * direction, power * (-direction));
+}
+//EXPERIMENTAL: Probably won't work, don't use. For research purposes only
+void rotateToFaceDirectionWithPower(int destination, int power){
+	destination = abs(destination);
+	int currentValue = SensorValue[turningGyro];
+	int clockwise = MHRotationDistanceNone;
+	int counterClockwise = MHRotationDistanceNone;
+	MHRotationDirection rotationDirection = MHRotationDirectionNoRotation;
+	if(destination < currentValue){
+		clockwise = destination + (MHRotationDistanceFullTurn - currentValue);
+		counterClockwise = currentValue - destination;
+	}
+	else if(destination > currentValue){
+		clockwise = destination - currentValue;
+		counterClockwise = currentValue + (MHRotationDistanceFullTurn - destination);
+	}
+	if(clockwise < counterClockwise){
+		rotationDirection = MHRotationDirectionCounterClockwise;
+	}
+	else if(clockwise > counterClockwise){
+		rotationDirection = MHRotationDirectionClockwise;
+	}
+	while(SensorValue[turningGyro] != destination){
+		rotate(power, rotationDirection);
+	}
+	rotate(MHMotorPowerStop, MHRotationDirectionNoRotation);
+}
+//EXPERIMENTAL: Same as above. Botttom line: don't use it
+void rotateToFaceDirection(int direction){
+	rotateToFaceDirectionWithPower(direction, MHMotorPowerMax);
+}
+void rotateDistanceInDirectionWithPower(int distance, MHRotationDirection direction, int power){
+	resetGyro();
+	distance = abs(distance);
+	if(distance > SensorFullCount[turningGyro]){
+		SensorFullCount[turningGyro] = distance;
+	}
+	while(abs(SensorValue[turningGyro]) < distance){
+		rotate(power, direction);
+	}
+	SensorFullCount[turningGyro] = MHRotationDistanceFullTurn;
+}
+void rotateDistanceInDirection(int distance, MHRotationDirection direction){
+	rotateDistanceInDirectionWithPower(distance, direction, MHMotorPowerMax);
+}
 //This *MUST* be called before an auton is run
-void initSkyriseIntakeWithTeamColor(MHTeamColor color){
+void initAutonomousWithTeamColor(MHTeamColor color){
 	roundColor = color;
 	SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
 	if(color == MHTeamColorRed){
-		skyriseSide = MHSkyriseArmRotationSideRightSide;
+		initialSkyriseRotationDirection = MHRotationDirectionClockwise;
 	}
 	else{
-		skyriseSide = MHSkyriseArmRotationSideLeftSide;
+		initialSkyriseRotationDirection = MHRotationDirectionCounterClockwise;
 	}
 }
 void runAutonomousStyleForTeamColor(MHTeamColor color, MHAutonStyle auton){
-	static bool shouldClear = true;
-	int wallSide = 1;
-	if(color == MHTeamColorBlue){
-		wallSide *= -1;
+	if(auton == MHAutonStyleCubeAuton){
+		if(color == MHTeamColorRed){
+			liftToPosition(MHLiftPositionLowPost);
+			basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+			wait1Msec(MHTimeOneSecond);
+			stopDrive();
+			resetLift();
+			liftToPosition(MHLiftPositionTop);
+		}
 	}
-	int skyriseBaseSide = -wallSide;
-	if((color == MHTeamColorRed || color == MHTeamColorBlue) && auton == MHAutonStyleSkyriseAuton){
-		//Release the claw
-		liftCubeForTime(MHTimeTenthSecond * 2, MHLiftDirectionDown);
-		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
-		//Grab the first skyrise
-		resetLift();
-		//motor[skyriseArm] = MHMotorPowerHalf * wallSide;
-		wait1Msec(MHTimeOneSecond);
-		//motor[skyriseArm] = MHMotorPowerStop;
-		SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
-		wait1Msec(MHTimeOneSecond);
-		//Place the skyrise
-		liftForEncoderDistance(MHSkyriseOneSkyrise, MHMotorPowerMax);
-		liftCubeForTime(MHTimeHalfSecond, MHLiftDirectionDown);
-		//motor[skyriseArm] = MHMotorPowerHalf * skyriseBaseSide;
-		wait1Msec(MHTimeOneSecond);
-		resetLift();
-		wait1Msec(MHTimeOneSecond);
-		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
-		//Grab the next skyrise
-		//motor[skyriseArm] = MHMotorPowerHalf * wallSide;
-		wait1Msec(MHTimeOneSecond * 2);
-		SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
-		//Place the skyrise
-		liftForEncoderDistance(MHSkyriseTwoSkyrises, MHMotorPowerMax);
-		//motor[skyriseArm] = MHMotorPowerHalf * skyriseBaseSide;
-		wait1Msec(MHTimeOneSecond);
-		liftForEncoderDistance(MHSkyriseLiftInaccuracy, -MHMotorPowerMax);
-		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
-		//Reset the skyrise arm
-		//motor[skyriseArm] = MHMotorPowerMax * wallSide;
-		wait1Msec(MHTimeOneSecond);
-		//motor[skyriseArm] = MHMotorPowerStop;
-	}
-	else if(auton == MHAutonStyleCubeAuton){
-		liftForEncoderDistance(1000, MHMotorPowerMax);
-		basicDrive(-MHMotorPowerMax, -MHMotorPowerMax);
-		wait1Msec(MHTimeHalfSecond);
-		stopDrive();
-		liftCubeForTime(MHTimeOneSecond, MHLiftDirectionDown);
-	}
-	else if((color == MHTeamColorRed || color == MHTeamColorBlue) && auton == MHAutonStyleSkills){
-		int diff = 0;
-		shouldClear = false;
-		runAutonomousStyleForTeamColor(MHTeamColorRed, MHAutonStyleSkyriseAuton);
-		//Grab the third skyrise
-		//motor[skyriseArm] = MHMotorPowerMax * wallSide;
-		wait1Msec(MHTimeTenthSecond);
-		SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
-		wait1Msec(MHTimeOneSecond);
-		//Place the skyrise
-		liftForEncoderDistance(MHSkyriseThreeSkyrises, MHMotorPowerMax);
-		//motor[skyriseArm] = MHMotorPowerHalf * skyriseBaseSide;
-		wait1Msec(MHTimeOneSecond);
-		diff = nMotorEncoder[lmLift] - MHSkyriseLiftInaccuracy;
-		liftForEncoderDistance(MHSkyriseLiftInaccuracy * 2, -MHMotorPowerMax);
-		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
-		liftForEncoderDistance(diff, -MHMotorPowerMax);
-		//Count down for 5 seconds
-		countDownForTime(MHTimeOneSecond * 5);
-		//Drive forward to push stuff
-		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
-		wait1Msec(MHTimeOneSecond * 5);
-		//Return to the starting tile
-		basicDrive(-MHMotorPowerMax, -MHMotorPowerMax);
-		wait1Msec(MHTimeOneSecond * 6);
-		stopDrive();
-		//Give some time to reposition
-		countDownForTime(MHTimeOneSecond * 5);
-		//Drive forward one last time
-		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
-		wait1Msec(MHTimeOneSecond * 5);
-		//Retreat a little so as not to lose points
-		basicDrive(-MHMotorPowerMax, -MHMotorPowerMax);
-		wait1Msec(MHTimeOneSecond + MHTimeHalfSecond);
-		stopDrive();
-	}
-	if(shouldClear){
-		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
-		wait1Msec(MHTimeTenthSecond * 2);
-		stopDrive();
-	}
-	shouldClear = true;
 }
 int time = 0;
 bool skyriseResetTaskRunning = false;

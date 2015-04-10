@@ -42,13 +42,13 @@ void pre_auton(){
 			//Cube auton chosen
 			waitForRelease();
 			roundAuton = MHAutonStyleCubeAuton;
-			initSkyriseIntakeWithTeamColor(MHTeamColorRed);
+			initAutonomousWithTeamColor(MHTeamColorRed);
 			break;
 		}
 		else if(nLCDButtons == MHLCDButtonCenter){
 			//Time for programminng skills
 			waitForRelease();
-			initSkyriseIntakeWithTeamColor(MHTeamColorRed);
+			initAutonomousWithTeamColor(MHTeamColorRed);
 			roundAuton = MHAutonStyleSkills;
 			displayScreenStyle(MHLCDScreenStyleVoltage);
 			break;
@@ -67,13 +67,13 @@ void pre_auton(){
 			if(nLCDButtons == MHLCDButtonLeft){
 				//We're on the red side
 				waitForRelease();
-				initSkyriseIntakeWithTeamColor(MHTeamColorRed);
+				initAutonomousWithTeamColor(MHTeamColorRed);
 				break;
 			}
 			else if(nLCDButtons == MHLCDButtonRight){
 				//We're on the blue side
 				waitForRelease();
-				initSkyriseIntakeWithTeamColor(MHTeamColorBlue);
+				initAutonomousWithTeamColor(MHTeamColorBlue);
 				break;
 			}
 		}
@@ -91,6 +91,13 @@ void pre_auton(){
 			}
 		}
 	}
+	//Reconfigure the gyroscope
+	displayLCDCenteredString(0, "Configuring Gyro");
+	displayLCDCenteredString(1, "Keep Robot Still");
+	SensorType[turningGyro] = sensorNone;
+	wait1Msec(MHTimeOneSecond);
+	SensorType[turningGyro] = sensorGyro;
+	wait1Msec(MHTimeOneSecond * 2);
 }
 task autonomous(){
 	displayScreenStyle(MHLCDScreenStyleVoltage);
@@ -98,7 +105,8 @@ task autonomous(){
 	float startBattery = nImmediateBatteryLevel;
 	float startOther = SensorValue[otherBattery];
 	//Auton running here
-	runAutonomousStyleForTeamColor(roundColor, roundAuton);
+	//runAutonomousStyleForTeamColor(roundColor, roundAuton);
+	liftToPosition(MHLiftPositionBottom / 2);
 	if(startBattery != nImmediateBatteryLevel || startOther != SensorValue[otherBattery]){
 		displayLCDVoltageString(1);
 	}
@@ -107,22 +115,22 @@ task usercontrol(){
 	//Drive control
 	displayScreenStyle(MHLCDScreenStyleVoltage);
 	bLCDBacklight = false;
-	//float startBattery = nImmediateBatteryLevel;
-	//float startOther = SensorValue[otherBattery];
+	float startBattery = nImmediateBatteryLevel;
+	float startOther = SensorValue[otherBattery];
 	//int frontDirection = 1;
 	bool shouldToggle = true;
 	while(true){
-		//if(startBattery != nImmediateBatteryLevel || startOther != SensorValue[otherBattery]){
-		//	displayLCDVoltageString(1);
-		//	startBattery = nImmediateBatteryLevel;
-		//	startOther = SensorValue[otherBattery];
-		//}
-		string top;
-		string bottom;
-		sprintf(top, "%d", nMotorEncoder[rmLift]);
-		sprintf(bottom, "%d", nMotorEncoder[lmLift]);
-		displayLCDCenteredString(0, top);
-		displayLCDCenteredString(1, bottom);
+		if(startBattery != nImmediateBatteryLevel || startOther != SensorValue[otherBattery]){
+			displayLCDVoltageString(1);
+			startBattery = nImmediateBatteryLevel;
+			startOther = SensorValue[otherBattery];
+		}
+		//string top;
+		//string bottom;
+		//sprintf(top, "%d", SensorValue[turningGyro]);
+		//sprintf(bottom, "%d", SensorValue[rLiftPotentiometer]);
+		//displayLCDCenteredString(0, top);
+		//displayLCDCenteredString(1, bottom);
 		if(abs(vexRT[Ch2]) <= 30){
 			stopDriveSide(MHRobotSideRight);
 		}

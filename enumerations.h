@@ -70,10 +70,26 @@ typedef enum{
 }MHSkyrise;
 //In a couple places, it's useful to have all of the above in an array, so they can be referenced by index, and not raw value
 static const MHSkyrise skyrises[5] = {MHSkyriseOneSkyrise, MHSkyriseTwoSkyrises, MHSkyriseThreeSkyrises, MHSkyriseFourSkyrises, MHSkyriseFiveSkyrises};
+//Constants to designate which direction the robot should rotate
 typedef enum{
-	//These are all raw approximate potentiometer values, for use in the swingArmToSide fuction of autonomous.h
-	MHSkyriseArmRotationSideRightSide = 925,
-	MHSkyriseArmRotationSideLeftSide = 2725,
-	MHSkyriseArmRotationSideMiddle = 1850,
-	MHSkyriseArmRotationSideOutOfBounds
-}MHSkyriseArmRotationSide;
+	MHRotationDirectionClockwise = 1,
+	MHRotationDirectionCounterClockwise = -1,
+	MHRotationDirectionNoRotation = 0
+}MHRotationDirection;
+//Constants to define different signifcant points in the lift in potentiometer values
+typedef enum{
+	MHLiftPositionTop = 0,
+	MHLiftPositionLowPost = 1100,
+	MHLiftPositionBottom = 1620
+}MHLiftPosition;
+//Constants to define positions for the turning gyroscope
+typedef enum{
+	MHRotationDistanceNone = 0,
+	MHRotationDistanceTenthDegree = 1,
+	MHRotationDistanceOneDegree = 10,
+	MHRotationDistanceTenDegrees = 100,
+	MHRotationDistanceHundredDegrees = 1000,
+	MHRotationDistanceQuarterRotation = 900,
+	MHRotationDistanceHalfRotation = 1800,
+	MHRotationDistanceFullTurn = 3600
+}MHRotationDistance;

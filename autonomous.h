@@ -227,7 +227,6 @@ void liftToPositionWithPower(int value, int power){
 	else{
 		liftDirection = MHLiftDirectionStop;
 	}
-	displayLCDCenteredString(0, "Lifting...");
 	while(SensorValue[rLiftPotentiometer] != value){
 		lift(power, liftDirection);
 	}
@@ -391,16 +390,42 @@ void runAutonomousStyleForTeamColor(MHTeamColor color, MHAutonStyle auton){
 		SensorValue[cubeIntake] = MHPneumaticPositionOpen;
 	}
 	else if(auton == MHAutonStyleSkyriseAuton){
+		int rotationDistance = (MHRotationDistanceFullTurn / 6) + MHRotationDistanceTenDegrees;
+		//Free the claw
 		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
-		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
-		wait1Msec(MHTimeTenthSecond);
-		stopDrive();
-		wait1Msec(MHTimeHalfSecond);
+		resetLift();
+		wait1Msec(MHTimeOneSecond);
+		//Place the first skyrise
 		SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
 		liftToPosition(MHSkyriseOneSkyrise);
 		wait1Msec(MHTimeHalfSecond);
-		rotateDistanceInDirection(MHRotationDistanceQuarterRotation / 2, MHRotationDirectionCounterClockwise);
+		rotateDistanceInDirection(rotationDistance, MHRotationDirectionCounterClockwise);
+		wait1Msec(MHTimeHalfSecond);
+		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+		wait1Msec(MHTimeTenthSecond);
+		stopDrive();
 		resetLift();
+		wait1Msec(MHTimeHalfSecond);
 		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
+		//Come back to the start
+		wait1Msec(MHTimeHalfSecond);
+		rotateDistanceInDirection(rotationDistance + (MHRotationDistanceOneDegree * 7), MHRotationDirectionClockwise);
+		wait1Msec(MHTimeTenthSecond);
+		basicDrive(-MHMotorPowerMax, -MHMotorPowerMax);
+		wait1Msec(MHTimeTenthSecond);
+		stopDrive();
+		wait1Msec(MHTimeQuarterSecond);
+		//Place the next skyrise
+		SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
+		wait1Msec(MHTimeHalfSecond);
+		liftToPosition(MHSkyriseTwoSkyrises);
+		rotateDistanceInDirection(rotationDistance + (MHRotationDistanceOneDegree * 7), MHRotationDirectionCounterClockwise);
+		wait1Msec(MHTimeHalfSecond);
+		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+		wait1Msec(MHTimeTenthSecond);
+		stopDrive();
+		liftToPosition(MHSkyriseOneSkyrise + (MHSkyriseOneSkyrise / 3));
+		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
+		resetLift();
 	}
 }

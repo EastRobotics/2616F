@@ -77,7 +77,7 @@ void pre_auton(){
 			}
 		}
 	}
-	//If it's the cube auton, we ask if we want a 3 or 1 point
+	//If it's the cube auton, we need to know which color we are
 	if(roundAuton == MHAutonStyleCubeAuton){
 		displayLCDCenteredString(1, "Red         Blue");
 		while(true){

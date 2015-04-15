@@ -7,7 +7,7 @@
 #define LCD
 #endif
 //Different default screen types, used by the displayScreen function in lcd.h to display a preconfigured screen
-typedef enum{
+typedef enum _MHLCDScreenStyle{
 	MHLCDScreenStyleColorSelection = 1,
 	MHLCDScreenStylePointSelection = 2,
 	MHLCDScreenStyleVoltage = 3,
@@ -15,7 +15,7 @@ typedef enum{
 	MHLCDScreenStyleCustom = 4
 }MHLCDScreenStyle;
 //Map of the possible LCD button combinations to make them easy to reference
-typedef enum{
+typedef enum _MHLCDButton{
 	MHLCDButtonLeft = 1,
 	MHLCDButtonCenter = 2,
 	MHLCDButtonRight = 4,

@@ -348,17 +348,17 @@ void initAutonomousWithTeamColor(MHTeamColor color){
 }
 void runAutonomousStyleForTeamColor(MHTeamColor color, MHAutonStyle auton){
 	SensorValue[cubeIntake] = MHPneumaticPositionOpen;
+	MHRotationDirection wallSide;
+	if(color == MHTeamColorRed){
+		wallSide = MHRotationDirectionClockwise;
+	}
+	else if(color == MHTeamColorBlue){
+		wallSide = MHRotationDirectionCounterClockwise;
+	}
+	else{
+		wallSide = MHRotationDirectionNoRotation;
+	}
 	if(auton == MHAutonStyleCubeAuton){
-		MHRotationDirection spinDirection;
-		if(color == MHTeamColorRed){
-			spinDirection = MHRotationDirectionCounterClockwise;
-		}
-		else if(color == MHTeamColorBlue){
-			spinDirection = MHRotationDirectionClockwise;
-		}
-		else{
-			spinDirection = MHRotationDirectionNoRotation;
-		}
 		liftToPosition(MHLiftPositionLowPost);
 		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
 		wait1Msec(MHTimeHalfSecond - 25);
@@ -370,7 +370,7 @@ void runAutonomousStyleForTeamColor(MHTeamColor color, MHAutonStyle auton){
 		wait1Msec(MHTimeHalfSecond + MHTimeQuarterSecond);
 		stopDrive();
 		liftToPosition(MHLiftPositionTop);
-		rotateDistanceInDirection(MHRotationDistanceQuarterRotation, spinDirection);
+		rotateDistanceInDirection(MHRotationDistanceQuarterRotation, wallSide);
 		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
 		wait1Msec(MHTimeHalfSecond);
 		stopDrive();
@@ -399,7 +399,7 @@ void runAutonomousStyleForTeamColor(MHTeamColor color, MHAutonStyle auton){
 		SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
 		liftToPosition(MHSkyriseOneSkyrise);
 		wait1Msec(MHTimeHalfSecond);
-		rotateDistanceInDirection(rotationDistance, MHRotationDirectionCounterClockwise);
+		rotateDistanceInDirection(rotationDistance, -wallSide);
 		wait1Msec(MHTimeHalfSecond);
 		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
 		wait1Msec(MHTimeTenthSecond);
@@ -409,7 +409,7 @@ void runAutonomousStyleForTeamColor(MHTeamColor color, MHAutonStyle auton){
 		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
 		//Come back to the start
 		wait1Msec(MHTimeHalfSecond);
-		rotateDistanceInDirection(rotationDistance + (MHRotationDistanceOneDegree * 7), MHRotationDirectionClockwise);
+		rotateDistanceInDirection(rotationDistance + (MHRotationDistanceOneDegree * 7), wallSide);
 		wait1Msec(MHTimeTenthSecond);
 		basicDrive(-MHMotorPowerMax, -MHMotorPowerMax);
 		wait1Msec(MHTimeTenthSecond);
@@ -419,7 +419,7 @@ void runAutonomousStyleForTeamColor(MHTeamColor color, MHAutonStyle auton){
 		SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
 		wait1Msec(MHTimeHalfSecond);
 		liftToPosition(MHSkyriseTwoSkyrises);
-		rotateDistanceInDirection(rotationDistance + (MHRotationDistanceOneDegree * 7), MHRotationDirectionCounterClockwise);
+		rotateDistanceInDirection(rotationDistance + (MHRotationDistanceOneDegree * 7), -wallSide);
 		wait1Msec(MHTimeHalfSecond);
 		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
 		wait1Msec(MHTimeTenthSecond);
@@ -427,5 +427,11 @@ void runAutonomousStyleForTeamColor(MHTeamColor color, MHAutonStyle auton){
 		liftToPosition(MHSkyriseOneSkyrise + (MHSkyriseOneSkyrise / 3));
 		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
 		resetLift();
+	}
+	else if(auton == MHAutonStyleOnePoint){
+		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+		wait1Msec(MHTimeOneSecond);
+		stopDrive();
+		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
 	}
 }

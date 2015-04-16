@@ -83,10 +83,10 @@ typedef enum _MHRotationDirection{
 typedef enum _MHLiftPosition{
 	MHLiftPositionCurrentPosition = (-1),
 	MHLiftPositionTop = 0,
-	MHLiftPositionMiddlePost = 800,
-	MHLiftPositionLowPost = 1100,
-	MHLiftPositionOneCube = 1300,
-	MHLiftPositionBottom = 1600
+	MHLiftPositionMiddlePost = 770,
+	MHLiftPositionLowPost = 1070,
+	MHLiftPositionOneCube = 1270,
+	MHLiftPositionBottom = 1570
 }MHLiftPosition;
 //Constants to define positions for the turning gyroscope
 typedef enum _MHRotationDistance{

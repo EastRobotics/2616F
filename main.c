@@ -1,6 +1,7 @@
 #pragma config(I2C_Usage, I2C1, i2cSensors)
 #pragma config(Sensor, in1,    otherBattery,   sensorAnalog)
 #pragma config(Sensor, in2,    turningGyro,    sensorGyro)
+#pragma config(Sensor, in6,    autonPotentiometer, sensorPotentiometer)
 #pragma config(Sensor, in7,    lLiftPotentiometer, sensorPotentiometer)
 #pragma config(Sensor, in8,    rLiftPotentiometer, sensorPotentiometer)
 #pragma config(Sensor, dgtl1,  cubeIntake,     sensorDigitalOut)
@@ -32,74 +33,74 @@
 #endif
 MHAutonStyle roundAuton = MHAutonStyleNoAuton;
 void pre_auton(){
-	displayScreenStyle(MHLCDScreenStyleVoltage);
-	waitForPressOfButton(MHLCDButtonCenter);
-	//Set up the style selection screen
-	bLCDBacklight = true;
-	displayLCDCenteredString(1, "Cube  1  Skyrise");
-	while(true){
-		if(nLCDButtons == MHLCDButtonLeft){
-			//Cube auton chosen
+	//displayScreenStyle(MHLCDScreenStyleVoltage);
+	//waitForPressOfButton(MHLCDButtonCenter);
+	////Set up the style selection screen
+	//bLCDBacklight = true;
+	//displayLCDCenteredString(1, "Cube  1  Skyrise");
+	//while(true){
+	//	if(nLCDButtons == MHLCDButtonLeft){
+	//		//Cube auton chosen
 			waitForRelease();
 			roundAuton = MHAutonStyleCubeAuton;
-			break;
-		}
-		else if(nLCDButtons == MHLCDButtonCenter){
-			//Time for programminng skills
-			waitForRelease();
-			initAutonomousWithTeamColor(MHTeamColorRed);
-			roundAuton = MHAutonStyleOnePoint;
-			displayScreenStyle(MHLCDScreenStyleVoltage);
-			break;
-		}
-		else if(nLCDButtons == MHLCDButtonRight){
-			//Skyrise auton chosen
-			waitForRelease();
-			roundAuton = MHAutonStyleSkyriseAuton;
-			break;
-		}
-	}
-	//If it's not the one point, we continue
-	if(roundAuton != MHAutonStyleOnePoint && roundAuton != MHAutonStyleCubeAuton){
-		displayLCDCenteredString(1, "Red         Blue");
-		while(true){
-			if(nLCDButtons == MHLCDButtonLeft){
-				//We're on the red side
+			//break;
+	//	}
+	//	else if(nLCDButtons == MHLCDButtonCenter){
+	//		//Time for programminng skills
+	//		waitForRelease();
+			//initAutonomousWithTeamColor(MHTeamColorRed);
+			//roundAuton = MHAutonStyleOnePoint;
+			//displayScreenStyle(MHLCDScreenStyleVoltage);
+	//		break;
+	//	}
+	//	else if(nLCDButtons == MHLCDButtonRight){
+	//		//Skyrise auton chosen
+	//		waitForRelease();
+	//		roundAuton = MHAutonStyleSkyriseAuton;
+	//		break;
+	//	}
+	//}
+	////If it's not the one point, we continue
+	//if(roundAuton != MHAutonStyleOnePoint && roundAuton != MHAutonStyleCubeAuton){
+	//	displayLCDCenteredString(1, "Red         Blue");
+	//	while(true){
+	//		if(nLCDButtons == MHLCDButtonLeft){
+	//			//We're on the red side
+	//			waitForRelease();
+	//			initAutonomousWithTeamColor(MHTeamColorRed);
+	//			break;
+	//		}
+	//		else if(nLCDButtons == MHLCDButtonRight){
+	//			//We're on the blue side
+	//			waitForRelease();
+	//			initAutonomousWithTeamColor(MHTeamColorBlue);
+	//			break;
+	//		}
+	//	}
+	//}
+	////If it's the cube auton, we need to know which color we are
+	//if(roundAuton == MHAutonStyleCubeAuton){
+	//	displayLCDCenteredString(1, "Red         Blue");
+	//	while(true){
+	//		if(nLCDButtons == MHLCDButtonRight){
+	//			waitForRelease();
+	//			initAutonomousWithTeamColor(MHTeamColorBlue);
+	//			break;
+	//		}
+	//		else if(nLCDButtons == MHLCDButtonLeft){
 				waitForRelease();
 				initAutonomousWithTeamColor(MHTeamColorRed);
-				break;
-			}
-			else if(nLCDButtons == MHLCDButtonRight){
-				//We're on the blue side
-				waitForRelease();
-				initAutonomousWithTeamColor(MHTeamColorBlue);
-				break;
-			}
-		}
-	}
-	//If it's the cube auton, we need to know which color we are
-	if(roundAuton == MHAutonStyleCubeAuton){
-		displayLCDCenteredString(1, "Red         Blue");
-		while(true){
-			if(nLCDButtons == MHLCDButtonRight){
-				waitForRelease();
-				initAutonomousWithTeamColor(MHTeamColorBlue);
-				break;
-			}
-			else if(nLCDButtons == MHLCDButtonLeft){
-				waitForRelease();
-				initAutonomousWithTeamColor(MHTeamColorRed);
-				break;
-			}
-		}
-	}
-	//Reconfigure the gyroscope
-	displayLCDCenteredString(0, "Configuring Gyro");
-	displayLCDCenteredString(1, "Keep Robot Still");
-	SensorType[turningGyro] = sensorNone;
-	wait1Msec(MHTimeOneSecond);
-	SensorType[turningGyro] = sensorGyro;
-	wait1Msec(MHTimeOneSecond * 2);
+				//break;
+	//		}
+	//	}
+	//}
+	////Reconfigure the gyroscope
+	//displayLCDCenteredString(0, "Configuring Gyro");
+	//displayLCDCenteredString(1, "Keep Robot Still");
+	//SensorType[turningGyro] = sensorNone;
+	//wait1Msec(MHTimeOneSecond);
+	//SensorType[turningGyro] = sensorGyro;
+	//wait1Msec(MHTimeOneSecond * 2);
 }
 task autonomous(){
 	displayScreenStyle(MHLCDScreenStyleVoltage);
@@ -119,7 +120,6 @@ task usercontrol(){
 	float startBattery = nImmediateBatteryLevel;
 	float startOther = SensorValue[otherBattery];
 	//int frontDirection = 1;
-	bool shouldToggle = true;
 	while(true){
 		if(startBattery != nImmediateBatteryLevel || startOther != SensorValue[otherBattery]){
 			displayLCDVoltageString(1);
@@ -164,15 +164,6 @@ task usercontrol(){
 		}
 		else if(vexRT[Btn7R]){
 			SensorValue[cubeIntake] = MHPneumaticPositionClosed;
-		}
-		else if(vexRT[Btn7U]){
-			if(shouldToggle){
-				SensorValue[cubeIntake] = !SensorValue[cubeIntake];
-				shouldToggle = false;
-			}
-		}
-		if(!vexRT[Btn7U]){
-			shouldToggle = true;
 		}
 	}
 }

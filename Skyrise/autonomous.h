@@ -3,13 +3,17 @@
 //This file depends on enumerations.h
 #include "enumerations.h"
 #endif
-MHSkyriseArmRotationSide skyriseSide;
+#ifndef LCD
+//This file also depends on lcd.h
+#include "lcd.h"
+#endif
+MHRotationDirection initialSkyriseRotationDirection;
 MHTeamColor roundColor;
 /////////////////////////////////////////////////////////////////////////////////////////
 //**Reset encoders**/
 /////////////////////////////////////////////////////////////////////////////////////////
 void resetEncoders(){                        //Clears lift encoders
-	nMotorEncoder[lbLift] = 0;
+	nMotorEncoder[lmLift] = 0;
   nMotorEncoder[rbLift] = 0;
 }
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -18,7 +22,7 @@ void resetEncoders(){                        //Clears lift encoders
 //Caveman-simple driving with nothing
 /////////////////////////////////////////////////////////////////////////////////////////
 void basicDrive(int leftPower, int rightPower){
-	motor[lmDrive] = motor[lbDrive] = leftPower;
+	motor[lfDrive] = motor[lbDrive] = leftPower;
  	motor[rDrive] = rightPower;
 }
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -77,7 +81,7 @@ void encoderDriveWithLift(int power, int encoderCount, int position){
 		//Drive robot at power
   	drive(power);
     if(nMotorEncoder[lbDrive] >= encoderCount){
-    	motor[lbDrive] = motor[lmDrive] = 0;
+    	motor[lbDrive] = motor[lfDrive] = 0;
     }
     if(nMotorEncoder[rDrive] >= encoderCount){
      	motor[rDrive] = motor[rDrive] = 0;
@@ -87,7 +91,7 @@ void encoderDriveWithLift(int power, int encoderCount, int position){
 	while(abs(nMotorEncoder[lbDrive]) < encoderCount && abs(nMotorEncoder[rDrive]) < encoderCount){
   	drive(power);
    	if(nMotorEncoder[lbDrive] >= encoderCount){
-    	motor[lbDrive] = motor[lmDrive] = 0;
+    	motor[lbDrive] = motor[lfDrive] = 0;
     }
     if(nMotorEncoder[rDrive] >= encoderCount){
     	motor[rDrive] = 0;
@@ -148,10 +152,10 @@ void liftLift(int encoderCount){
 	//int encoderAverage = (abs(nMotorEncoder[leftLiftBottom]) + abs(nMotorEncoder[rightLiftBottom]))/2;
 	while(true){
 		if(abs(nMotorEncoder[rbLift]) < encoderCount){
-			motor[lfLift] = motor[lbLift] =  motor[rfLift] = motor[rbLift]  = 127;
+			motor[lbLift] = motor[lmLift] = motor[ltLift] =  motor[rtLift] = motor[rmLift] = motor[rbLift]  = 127;
 		}
 		else{
-			motor[lfLift] = motor[lbLift] =  motor[rfLift] = motor[rbLift] = 0;
+			motor[lbLift] = motor[lmLift] = motor[ltLift] =  motor[rtLift] = motor[rmLift] = motor[rbLift] = 0;
 			return;
 		}
 	}
@@ -164,26 +168,26 @@ void lowerLift(int encoderCount){
 	//int encoderAverage = (abs(nMotorEncoder[leftLiftBottom]) + abs(nMotorEncoder[rightLiftBottom]))/2;
 	while(true){
 		if(abs(nMotorEncoder[rbLift]) > encoderCount){
-			motor[lfLift] = motor[lbLift] = motor[rfLift] = motor[rbLift] = -127;
+			motor[lbLift] = motor[lmLift] = motor[ltLift] = motor[rmLift] = motor[rbLift] = motor[rtLift] = -127;
 		}
 		else{
-			motor[lfLift] = motor[lbLift] = motor[rfLift] = motor[rbLift] = 0;
+			motor[lbLift] = motor[lmLift] = motor[ltLift] = motor[rmLift] = motor[rbLift] = motor[rtLift] = 0;
 			return;
 		}
 	}
 }
 void lift(int power, MHLiftDirection direction){
-	motor[rfLift] = motor[rbLift] = motor[lfLift] = motor[lbLift] = abs(power) * direction;
+	motor[rtLift] = motor[rbLift] = motor[rmLift] = motor[lbLift] = motor[lmLift] = motor[ltLift] = abs(power) * direction;
 }
 void stopDriveSide(MHRobotSide side){
 	 if(side == MHRobotSideRight){
 	   motor[rDrive] = MHMotorPowerStop;
 	 }
 	 else if(side == MHRobotSideLeft){
-	   motor[lmDrive] = motor[lbDrive] = MHMotorPowerStop;
+	   motor[lfDrive] = motor[lbDrive] = MHMotorPowerStop;
 	 }
 	 else{
-	   motor[rDrive] = motor[lmDrive] = motor[lbDrive] = MHMotorPowerStop;
+	   motor[rDrive] = motor[lfDrive] = motor[lbDrive] = MHMotorPowerStop;
 	 }
 }
 void stopDrive(){
@@ -194,11 +198,7 @@ void liftForEncoderDistance(int count, int power){
 	resetEncoders();
 	string first;
 	string second;
-	while(abs(nMotorEncoder[lbLift]) < count){
-		sprintf(first, "%d", abs(nMotorEncoder[lbLift]));
-		sprintf(second, "%d", abs(nMotorEncoder[rbLift]));
-		displayLCDCenteredString(0, first);
-		displayLCDCenteredString(1, second);
+	while((abs(nMotorEncoder[lmLift]) + abs(nMotorEncoder[rbLift])) / 2 < count){
 		if(power > 0){
 			lift(power, MHLiftDirectionUp);
 		}
@@ -212,8 +212,47 @@ void liftForEncoderDistance(int count, int power){
 	}
 	lift(MHMotorPowerStop, MHLiftDirectionStop);
 }
+void liftToPositionWithPower(int value, int power){
+	//Up is negative, down is positive
+	if(value == (int)MHLiftPositionCurrentPosition){
+		value = SensorValue[rLiftPotentiometer];
+	}
+	MHLiftDirection liftDirection;
+	if(value > SensorValue[rLiftPotentiometer]){
+		liftDirection = MHLiftDirectionDown;
+	}
+	else if(value < SensorValue[rLiftPotentiometer]){
+		liftDirection = MHLiftDirectionUp;
+	}
+	else{
+		liftDirection = MHLiftDirectionStop;
+	}
+	while(SensorValue[rLiftPotentiometer] != value){
+		lift(power, liftDirection);
+	}
+	lift(MHMotorPowerStop, MHLiftDirectionStop);
+}
+void liftToPosition(int value){
+	liftToPositionWithPower(value, MHMotorPowerMax);
+}
 void resetLift(){
-	liftForEncoderDistance(nMotorEncoder[lbLift], -MHMotorPowerMax);
+	liftToPosition(MHLiftPositionBottom);
+}
+void liftForPotentiometerDistanceInDirectionWithPower(int distance, MHLiftDirection direction, int power){
+	int position = MHLiftPositionCurrentPosition;
+	if(direction == MHLiftDirectionUp && SensorValue[rLiftPotentiometer] - distance < (int)MHLiftPositionTop){
+		position = MHLiftPositionTop;
+	}
+	else if(direction == MHLiftDirectionDown && SensorValue[rLiftPotentiometer] + distance > (int)MHLiftPositionBottom){
+		position = MHLiftPositionBottom;
+	}
+	else{
+		position = SensorValue[rLiftPotentiometer] + (distance * direction);
+	}
+	liftToPositionWithPower(position, power);
+}
+void liftForPotentiometerDistanceInDirection(int distance, MHLiftDirection direction){
+	liftForPotentiometerDistanceInDirectionWithPower(distance, direction, MHMotorPowerMax);
 }
 void liftCube(MHLiftDirection direction){
 	motor[cubeIntake] = MHMotorPowerMax * direction;
@@ -222,71 +261,6 @@ void liftCubeForTime(int time, MHLiftDirection direction){
 	liftCube(direction);
 	wait1Msec(time);
 	liftCube(MHLiftDirectionStop);
-}
-bool armIsInRangeOfSide(MHSkyriseArmRotationSide side){
-	if(side == MHSkyriseArmRotationSideRightSide || side == MHSkyriseArmRotationSideLeftSide){
-		if(SensorValue[armAngle] <= side + 100 && SensorValue[armAngle] >= side - 100){
-			return true;
-		}
-	}
-	else if(side == MHSkyriseArmRotationSideMiddle){
-		if(SensorValue[armAngle] > MHSkyriseArmRotationSideRightSide && SensorValue[armAngle] < MHSkyriseArmRotationSideLeftSide){
-			return true;
-		}
-		else{
-			return false;
-		}
-	}
-	else if(side == MHSkyriseArmRotationSideOutOfBounds){
-		if(SensorValue[armAngle] < MHSkyriseArmRotationSideRightSide || SensorValue[armAngle] > MHSkyriseArmRotationSideLeftSide){
-			return true;
-		}
-		else{
-			return false;
-		}
-	}
-	else{
-		return false;
-	}
-}
-MHSkyriseArmRotationSide currentArmSide(){
-	if(armIsInRangeOfSide(MHSkyriseArmRotationSideLeftSide)){
-		return MHSkyriseArmRotationSideLeftSide;
-	}
-	else if(armIsInRangeOfSide(MHSkyriseArmRotationSideMiddle)){
-		return MHSkyriseArmRotationSideMiddle;
-	}
-	else if(armIsInRangeOfSide(MHSkyriseArmRotationSideRightSide)){
-		return MHSkyriseArmRotationSideRightSide;
-	}
-	else{
-		return MHSkyriseArmRotationSideOutOfBounds;
-	}
-}
-void swingArmToSide(MHSkyriseArmRotationSide side){
-	if(side != MHSkyriseArmRotationSideOutOfBounds){
-		int direction = 1;
-		 if(side == MHSkyriseArmRotationSideRightSide || (side == MHSkyriseArmRotationSideMiddle && SensorValue[armAngle] > MHSkyriseArmRotationSideMiddle)){
-		   direction *= -1;
-		 }
-		 displayLCDCenteredString(0, "Moving arm");
-		 while(currentArmSide() != side){
-		   motor[skyriseArm] = MHMotorPowerMax * direction;
-		 }
-		 displayLCDCenteredString(1, "Arm moved");
-	}
-}
-void toggleArmSide(){
-	if(currentArmSide() == MHSkyriseArmRotationSideRightSide){
-		swingArmToSide(MHSkyriseArmRotationSideLeftSide);
-	}
-	else if(currentArmSide() == MHSkyriseArmRotationSideLeftSide){
-		swingArmToSide(MHSkyriseArmRotationSideRightSide);
-	}
-	else{
-		//Just in case it's out of bounds (or in the middle), we'll default to swinging to whatever side the skyrise is on
-		swingArmToSide(skyriseSide);
-	}
 }
 MHSkyrise MHSkyriseForInt(int count){
 	if(count >= 1 && count <= 5){
@@ -304,100 +278,167 @@ int intForMHSkyrise(MHSkyrise skyrise){
 	}
 	return NULL;
 }
-//Right now, this is timing-based, which is far from ideal. Hopefully, I can use the potentiometer in the future
-void placeSkyrise(MHSkyrise skyrise, MHTeamColor matchColor){
-	if(matchColor == MHTeamColorRed || matchColor == MHTeamColorBlue){
-		int wallSide = 1;
-		if(matchColor == MHTeamColorBlue){
-			wallSide *= -1;
-		}
-		int skyriseBaseSide = -wallSide;
-		static int invocations = 1;
-		//First, let's make sure that the claw is unclenched
-		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
-		//Then, let's make sure the lift is at the bottom
-		resetLift();
-		//Grab the skyrise
-		motor[skyriseArm] = MHMotorPowerMax * wallSide;
-		//If this is the first time we're running, we only need to take half as long to move to the wall
-		if(invocations == 1){
-			wait1Msec(MHTimeHalfSecond);
-		}
-		else{
-			wait1Msec(MHTimeOneSecond);
-		}
-		motor[skyriseArm] = MHMotorPowerStop;
-		SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
-		wait1Msec(MHTimeOneSecond);
-		//Actually place the skyrise
-		liftForEncoderDistance(skyrise, MHMotorPowerMax);
-		//If this is the first time we've run, we want to make sure the cube intake is out of the way, and ready to use in driver control
-		if(invocations == 1){
-			liftCubeForTime(MHTimeTenthSecond * 3, MHLiftDirectionDown);
-		}
-		motor[skyriseArm] = MHMotorPowerHalf * skyriseBaseSide;
-		wait1Msec(MHTimeOneSecond);
-		liftForEncoderDistance(MHSkyriseLiftInaccuracy, -MHMotorPowerMax);
-		//If this is still the first time we're running, we need to just continue to the bottom
-		if(intForMHSkyrise(skyrise) == 1){
-			resetLift();
-		}
-		wait1Msec(MHTimeHalfSecond);
-		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
-		invocations++;
+int trueNorth = 0;
+void resetGyro(){
+	trueNorth += (trueNorth - SensorValue[turningGyro]);
+	SensorValue[turningGyro] = 0;
+}
+void rotate(int power, MHRotationDirection direction){
+	basicDrive(power * direction, power * (-direction));
+}
+//EXPERIMENTAL: Probably won't work, don't use. For research purposes only
+void rotateToFaceDirectionWithPower(int destination, int power){
+	destination = abs(destination);
+	int currentValue = SensorValue[turningGyro];
+	int clockwise = MHRotationDistanceNone;
+	int counterClockwise = MHRotationDistanceNone;
+	MHRotationDirection rotationDirection = MHRotationDirectionNoRotation;
+	if(destination < currentValue){
+		clockwise = destination + (MHRotationDistanceFullTurn - currentValue);
+		counterClockwise = currentValue - destination;
 	}
+	else if(destination > currentValue){
+		clockwise = destination - currentValue;
+		counterClockwise = currentValue + (MHRotationDistanceFullTurn - destination);
+	}
+	if(clockwise < counterClockwise){
+		rotationDirection = MHRotationDirectionCounterClockwise;
+	}
+	else if(clockwise > counterClockwise){
+		rotationDirection = MHRotationDirectionClockwise;
+	}
+	while(SensorValue[turningGyro] != destination){
+		rotate(power, rotationDirection);
+	}
+	rotate(MHMotorPowerStop, MHRotationDirectionNoRotation);
+}
+//EXPERIMENTAL: Same as above. Botttom line: don't use it
+void rotateToFaceDirection(int direction){
+	rotateToFaceDirectionWithPower(direction, MHMotorPowerMax);
+}
+void rotateDistanceInDirectionWithPower(int distance, MHRotationDirection direction, int power){
+	resetGyro();
+	distance = abs(distance);
+	if(distance > SensorFullCount[turningGyro]){
+		SensorFullCount[turningGyro] = distance;
+	}
+	while(abs(SensorValue[turningGyro]) < distance){
+		rotate(power, direction);
+	}
+	stopDrive();
+	SensorFullCount[turningGyro] = MHRotationDistanceFullTurn;
+}
+void rotateDistanceInDirection(int distance, MHRotationDirection direction){
+	int correction = MHRotationDistanceTenDegrees * 1.5;
+	if(distance > correction){
+		distance -= correction;
+	}
+	rotateDistanceInDirectionWithPower(distance, direction, MHMotorPowerMax);
 }
 //This *MUST* be called before an auton is run
-void initSkyriseIntakeWithTeamColor(MHTeamColor color){
+void initAutonomousWithTeamColor(MHTeamColor color){
 	roundColor = color;
-	SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
+	SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
 	if(color == MHTeamColorRed){
-		skyriseSide = MHSkyriseArmRotationSideRightSide;
+		initialSkyriseRotationDirection = MHRotationDirectionClockwise;
 	}
 	else{
-		skyriseSide = MHSkyriseArmRotationSideLeftSide;
+		initialSkyriseRotationDirection = MHRotationDirectionCounterClockwise;
 	}
 }
-void runAutonomousForTeamColor(MHTeamColor color){
-	if(color == MHTeamColorRed || color == MHTeamColorBlue){
-		int wallSide = 1;
-		if(color == MHTeamColorBlue){
-			wallSide *= -1;
-		}
-		int skyriseBaseSide = -wallSide;
-		//Release the claw
-		liftCubeForTime(MHTimeTenthSecond * 2, MHLiftDirectionDown);
+void runAutonomousStyleForTeamColor(MHTeamColor color, MHAutonStyle auton){
+	SensorValue[cubeIntake] = MHPneumaticPositionOpen;
+	MHRotationDirection wallSide;
+	if(color == MHTeamColorRed){
+		wallSide = MHRotationDirectionClockwise;
+	}
+	else if(color == MHTeamColorBlue){
+		wallSide = MHRotationDirectionCounterClockwise;
+	}
+	else{
+		wallSide = MHRotationDirectionNoRotation;
+	}
+	if(auton == MHAutonStyleCubeAuton){
+		//liftToPosition(MHLiftPositionLowPost);
+		//basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+		//wait1Msec(MHTimeHalfSecond - 25);
+		//stopDrive();
+		//resetLift();
+		//wait1Msec(MHTimeTenthSecond);
+		//liftToPosition(MHLiftPositionBottom - 10);
+		//basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+		//wait1Msec(MHTimeHalfSecond + MHTimeQuarterSecond);
+		//stopDrive();
+		//liftToPosition(MHLiftPositionTop);
+		//rotateDistanceInDirection(MHRotationDistanceQuarterRotation, wallSide);
+		//basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+		//wait1Msec(MHTimeHalfSecond);
+		//stopDrive();
+		//wait1Msec(MHTimeHalfSecond);
+		////basicDrive(-MHMotorPowerMax, -MHMotorPowerMax);
+		////wait1Msec(MHTimeTenthSecond * 1.5);
+		////stopDrive();
+		//liftToPosition(MHLiftPositionMiddlePost);
+		//SensorValue[cubeIntake] = MHPneumaticPositionClosed;
+		//wait1Msec(MHTimeHalfSecond);
+		//liftToPosition(MHLiftPositionTop);
+		//basicDrive((-100), (-100));
+		//wait1Msec(MHTimeHalfSecond);
+		//stopDrive();
+		//liftToPosition(MHLiftPositionBottom);
+		//SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
+		//SensorValue[cubeIntake] = MHPneumaticPositionOpen;
+		liftToPosition(MHLiftPositionLowPost);
+		wait1Msec(MHTimeOneSecond);
+		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+		wait1Msec(MHTimeHalfSecond);
+		stopDrive();
 		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
-		//Grab the first skyrise
+	}
+	else if(auton == MHAutonStyleSkyriseAuton){
+		int rotationDistance = (MHRotationDistanceFullTurn / 6) + MHRotationDistanceTenDegrees;
+		//Free the claw
+		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
 		resetLift();
-		motor[skyriseArm] = MHMotorPowerHalf * wallSide;
-		wait1Msec(MHTimeOneSecond);
-		motor[skyriseArm] = MHMotorPowerStop;
+		wait1Msec(MHTimeOneSecond * 2);
+		//Place the first skyrise
 		SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
-		wait1Msec(MHTimeOneSecond);
-		//Place the skyrise
-		liftForEncoderDistance(MHSkyriseOneSkyrise, MHMotorPowerMax);
-		liftCubeForTime(MHTimeHalfSecond, MHLiftDirectionDown);
-		motor[skyriseArm] = MHMotorPowerHalf * skyriseBaseSide;
-		wait1Msec(MHTimeOneSecond);
+		liftToPosition(MHSkyriseOneSkyrise);
+		wait1Msec(MHTimeHalfSecond);
+		rotateDistanceInDirection(rotationDistance, -wallSide);
+		wait1Msec(MHTimeHalfSecond);
+		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+		wait1Msec(MHTimeTenthSecond);
+		stopDrive();
 		resetLift();
-		wait1Msec(MHTimeOneSecond);
+		wait1Msec(MHTimeHalfSecond);
 		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
-		//Grab the next skyrise
-		motor[skyriseArm] = MHMotorPowerHalf * wallSide;
-		wait1Msec(MHTimeOneSecond);
-		motor[skyriseArm] = MHMotorPowerStop;
-		wait1Msec(MHTimeOneSecond);
+		//Come back to the start
+		wait1Msec(MHTimeHalfSecond);
+		rotateDistanceInDirection(rotationDistance + (MHRotationDistanceOneDegree * 7), wallSide);
+		wait1Msec(MHTimeTenthSecond);
+		basicDrive(-MHMotorPowerMax, -MHMotorPowerMax);
+		wait1Msec(MHTimeTenthSecond);
+		stopDrive();
+		wait1Msec(MHTimeQuarterSecond);
+		//Place the next skyrise
+		wait1Msec(MHTimeOneSecond * 2);
 		SensorValue[skyriseClaw] = MHPneumaticPositionClosed;
-		//Place the skyrise
-		liftForEncoderDistance(MHSkyriseTwoSkyrises, MHMotorPowerMax);
-		motor[skyriseArm] = MHMotorPowerHalf * skyriseBaseSide;
-		wait1Msec(MHTimeOneSecond);
-		liftForEncoderDistance(MHSkyriseLiftInaccuracy, -MHMotorPowerMax);
+		wait1Msec(MHTimeHalfSecond);
+		liftToPosition(MHSkyriseTwoSkyrises);
+		rotateDistanceInDirection(rotationDistance + (MHRotationDistanceOneDegree * 7), -wallSide);
+		wait1Msec(MHTimeHalfSecond);
+		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
+		wait1Msec(MHTimeTenthSecond);
+		stopDrive();
+		liftToPosition(MHSkyriseOneSkyrise + (MHSkyriseOneSkyrise / 3));
 		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
-		//Reset the skyrise arm
-		motor[skyriseArm] = MHMotorPowerMax * wallSide;
+		resetLift();
+	}
+	else if(auton == MHAutonStyleOnePoint){
+		basicDrive(MHMotorPowerMax, MHMotorPowerMax);
 		wait1Msec(MHTimeOneSecond);
-		motor[skyriseArm] = MHMotorPowerStop;
+		stopDrive();
+		SensorValue[skyriseClaw] = MHPneumaticPositionOpen;
 	}
 }

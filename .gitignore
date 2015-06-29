@@ -31,3 +31,8 @@
 # Conrad's libraries
 
 /Conrad
+
+# Atom patches
+
+Vex_Competition_Includes.*
+/**/Vex_Competition_Includes.*

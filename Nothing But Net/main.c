@@ -15,5 +15,29 @@
 #pragma autonomousDuration(15)
 #pragma userControlDuration(105)
 #include "Vex_Competition_Includes.c"
-#include "enumerations.h"
+#include "constants.h"
 #include "autonomous.h"
+#include "lcd.h"
+
+//Placeholder for the pre-autonomous task
+void pre_auton(){
+  //Display a generic idle screen on the LCD
+  idleScreen();
+}
+
+//Placeholder for the autonomous task
+task autonomous(){
+  //Display a generic idle screen on the LCD
+  idleScreen();
+  AutonomousCodePlaceholderForTesting();
+}
+
+//Acutal driver control
+task usercontrol(){
+  idleScreen();
+  //Make sure we're always running
+  while(true){
+    //Make the robot moves, if we want it to
+    drive(MHControllerJoystickLeftYAxis, MHControllerJoystickRightYAxis);
+  }
+}

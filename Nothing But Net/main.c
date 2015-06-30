@@ -16,7 +16,7 @@
 #pragma userControlDuration(105)
 #include "Vex_Competition_Includes.c"
 #include "constants.h"
-#include "autonomous.h"
+#include "robot.h"
 #include "lcd.h"
 
 //Placeholder for the pre-autonomous task
@@ -29,15 +29,40 @@ void pre_auton(){
 task autonomous(){
   //Display a generic idle screen on the LCD
   idleScreen();
-  AutonomousCodePlaceholderForTesting();
+  //Just run all the cannon motors until the field tells us to stop
+  fire();
 }
 
 //Acutal driver control
 task usercontrol(){
+  //Display a generic idle screen on the LCD
   idleScreen();
   //Make sure we're always running
   while(true){
     //Make the robot move, if we want it to
-    drive(MHControllerJoystickLeftYAxis, MHControllerJoystickRightYAxis);
+    drive(MHControllerJoystickLeftYAxisValue, MHControllerJoystickRightYAxisValue);
+    if(MHControllerShoulderLeftButtonTopPressed){
+      //If the top-left shoulder button (5U) is pressed, run the intake motors
+      intake();
+    }
+    else if(MHControllerShoulderLeftButtonBottomPressed){
+      //If the bottom-left shoulder button (5D) is pressed, run the intake motors backwards
+      intakeInDirection(MHIntakeDirectionOuttake); //Don't worry about using this function. It runs the intake backwards
+    }
+    else{
+      //If neither is pressed, stop the intake
+      holdIntake();
+    }
+    if(MHControllerShoulderRightButtonTopPressed){
+      //If the top-right shoulder button (6U) is pressed, run the launch motors
+      launch();
+    }
+    else if(MHControllerShoulderRightButtonBottomPressed){
+      //If the bottom-right shoulder button (6D) is pressed, run the launch motors in reverse
+      launchInDirection(MHLaunchDirectionBackfire); // Don't worry about using this function. It runs the launch backwards
+    }
+    else{
+      holdLaunch();
+    }
   }
 }

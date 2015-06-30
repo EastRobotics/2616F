@@ -37,7 +37,7 @@ task usercontrol(){
   idleScreen();
   //Make sure we're always running
   while(true){
-    //Make the robot moves, if we want it to
+    //Make the robot move, if we want it to
     drive(MHControllerJoystickLeftYAxis, MHControllerJoystickRightYAxis);
   }
 }

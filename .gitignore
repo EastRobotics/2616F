@@ -40,3 +40,7 @@ Vex_Competition_Includes.*
 # Lightning Development Library
 
 Lightning/
+
+# OS X System Files
+.DS_Store
+/**/.DS_Store

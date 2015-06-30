@@ -43,4 +43,7 @@ This function does not return anything
 
 Called like: print("Top Line", "Bottom Line"); */
 void print(string top, string bottom);
+
+//Define everything declared above
+#include "lcd.c"
 #endif

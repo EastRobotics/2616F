@@ -3,7 +3,10 @@
 //Make sure there are never any collisions
 #ifndef __LCD_H__
 #define __LCD_H__
+
+///////////////////////////////////////////////////////////////////////////////
 //MARK: - Constant Definitions
+///////////////////////////////////////////////////////////////////////////////
 
 //Enumeration to define lines on the LCD
 typedef enum _MHLCDLine{
@@ -13,23 +16,31 @@ typedef enum _MHLCDLine{
   MHLCDLineBottom = 1
 }MHLCDLine;
 
-//MARK: - Function Prototype Declarations
+///////////////////////////////////////////////////////////////////////////////
+//MARK: - Whole Screen Functions
+///////////////////////////////////////////////////////////////////////////////
 
-//Puts the screen in an idle state, suitable for when it's not being used
+/* Puts the screen in an idle state, suitable for when it's not being used
+
+This function takes no parameters
+
+This function does not return anything
+
+Called like: idleScreen();
+ */
 void idleScreen();
-//Shorthand to display something on both lines of the LCD
+
+///////////////////////////////////////////////////////////////////////////////
+//MARK: - Single Line-Based Functions
+///////////////////////////////////////////////////////////////////////////////
+
+/* Displays a string on each line of the LCD
+
+string top: Text to display on the top line of the LCD
+string bottom: Text to display on the bottom line of the LCD
+
+This function does not return anything
+
+Called like: print("Top Line", "Bottom Line"); */
 void print(string top, string bottom);
-
-//MARK: - Function Definitions
-
-//Put the screen in a good state for when no one is looking
-void idleScreen(){
-  bLCDBacklight = false;
-  print("2616F", "Frightening Lightning");
-}
-//Easily display something on both lines
-void print(string top, string bottom){
-  displayLCDCenteredString(MHLCDLineTop, top);
-  displayLCDCenteredString(MHLCDLineBottom, bottom);
-}
 #endif

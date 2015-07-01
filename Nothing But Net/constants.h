@@ -25,8 +25,8 @@ static const MHDuration MHDriverControlDuration = 105;
 ///////////////////////////////////////////////////////////////////////////////
 
 //Preprocessor definitions for vexRT manipulation
-#define MHControllerJoystickLeftXAxValue vexRT[Ch4]
-#define MHControllerJoystickLeftYAxValue vexRT[Ch3]
+#define MHControllerJoystickLeftXAxisValue vexRT[Ch4]
+#define MHControllerJoystickLeftYAxisValue vexRT[Ch3]
 #define MHControllerJoystickRightXAxValue vexRT[Ch1]
 #define MHControllerJoystickRightYAxValue vexRT[Ch2]
 #define MHControllerDPadLeftButtonTopPressed vexRT[Btn7U]

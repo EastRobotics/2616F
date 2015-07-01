@@ -23,10 +23,10 @@ void idleScreen(){
 ///////////////////////////////////////////////////////////////////////////////
 
 //Easily display something on both lines
-void print(string top, string bottom){
+void print(const string top, const string bottom){
   //Print the specified text on the top line
-  displayLCDCenteredString(MHLCDLineTop, top);
+  displayLCDCenteredString((int)MHLCDLineTop, top);
   //Print the specified text on the bottom line
-  displayLCDCenteredString(MHLCDLineBottom, bottom);
+  displayLCDCenteredString((int)MHLCDLineBottom, bottom);
 }
 #endif

@@ -42,7 +42,7 @@ string bottom: Text to display on the bottom line of the LCD
 This function does not return anything
 
 Called like: print("Top Line", "Bottom Line"); */
-void print(string top, string bottom);
+void print(const string top, const string bottom);
 
 //Define everything declared above
 #include "lcd.c"

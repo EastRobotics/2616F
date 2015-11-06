@@ -4,7 +4,14 @@
 //Silence any unnecessary warnings
 #pragma systemFile
 //Require our header
+#ifndef __LCD_H__
 #include "lcd.h"
+#endif
+
+//Make sure we can use battery functions
+#ifndef __BATTERY_H__
+#include "battery.h"
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 //MARK: - Whole Screen Functions

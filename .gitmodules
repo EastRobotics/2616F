@@ -1,0 +1,3 @@
+[submodule "Lightning"]
+	path = Lightning
+	url = git@github.com:EastRobotics/Lightning.git

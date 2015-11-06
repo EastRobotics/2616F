@@ -3,8 +3,13 @@
 #define __ROBOT_H__
 //Prevent any unnecessary warnings
 #pragma systemFile
+//Make sure this file only gets #included once
+#pragma once
+
 //Define all constants
+#ifndef __CONSTANTS_H__
 #include "constants.h"
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 //MARK: - Enumerations
@@ -37,22 +42,24 @@ typedef enum _MHDriveSide{
 
 /* The simplest of drive functions
 
-int left: Integer to represent how fast you want the left side of the drive to go
-int right: Integer to represent how fast you want the right side of the drive to go
+const short left: Integer to represent how fast you want the left side of the drive to go
+const short right: Integer to represent how fast you want the right side of the drive to go
 
 This function does not return anything
 
 Called like: drive(42, 42); */
-void drive(int left, int right);
+void drive(const short left, const short right);
+
 /* Change the speed of only one side of the drive
 
-MHDriveSide side: Constant to represent which side of the drive you want to change speed
-int power: Integer to represent the power you want the side of the drive to move
+const MHDriveSide side: Constant to represent which side of the drive you want to change speed
+const short power: Integer to represent the power you want the side of the drive to move
 
 This function does not return anything
 
 Called like: driveSideWithPower(MHDriveSideLeft, 42); */
-void driveSideWithPower(MHDriveSide side, int power);
+void driveSideWithPower(const MHDriveSide side, short power);
+
 /* Brings the robot to a full stop
 
 This function takes no parameters
@@ -61,14 +68,15 @@ This function does not return anything
 
 Called like: stop(); */
 void stop();
+
 /* Stops the motors on only one side of the drive
 
-MHDriveSide side: Constant to represent which side of the drive you want to stop
+const MHDriveSide side: Constant to represent which side of the drive you want to stop
 
 This function does not return anything
 
 Called like: stopDriveSide(MHDriveSideLeft); */
-void stopDriveSide(MHDriveSide side);
+void stopDriveSide(const MHDriveSide side);
 
 ///////////////////////////////////////////////////////////////////////////////
 //MARK: - Ball Launching Functions
@@ -82,6 +90,7 @@ This function does not return anything
 
 Called like: intake(); */
 void intake();
+
 /* Stops the intake motors to prevent any more ammunition from coming into the launch chamber
 
 This function takes no parameters
@@ -90,6 +99,7 @@ This function does not return anything
 
 Called like: holdIntake(); */
 void holdIntake();
+
 /* Runs the motors to launch any ammunition in the launching chambers
 
 This function takes no parameters
@@ -97,8 +107,8 @@ This function takes no parameters
 This function does not return anything
 
 Called like: launch(); */
-
 void launch();
+
 /* Stops the launch motors, to prevent any ammunition from being fired from the launch chamber
 
 This function takes no parameters
@@ -107,6 +117,7 @@ This function does not return anything
 
 Called like: holdLaunch(); */
 void holdLaunch();
+
 /* Runs all motors in the cannon assembly to immediately launch any ammunition that comes in the intake
 
 This function takes no parameters
@@ -115,6 +126,7 @@ This function does not return anything
 
 Called like: fire(); */
 void fire();
+
 /* Stops all motors in the cannon assembly, to prevent anything from entering or leaving the launch chamber
 
 This function takes no parameters

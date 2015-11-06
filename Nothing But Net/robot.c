@@ -4,7 +4,9 @@
 //Make sure we don't cause any unnecessary warnings
 #pragma systemFile
 //Require our header
+#ifndef __ROBOT_H__
 #include "robot.h"
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 //MARK: - Private Enumerations
@@ -34,15 +36,15 @@ typedef enum _MHLaunchDirection{
 ///////////////////////////////////////////////////////////////////////////////
 
 //Definition of the simplest of drive functions
-void drive(int left, int right){
+void drive(const short left, const short right){
   //Pass the integers given verbatim into the main drive function for each side
   driveSideWithPower(MHDriveSideLeft, left);
   driveSideWithPower(MHDriveSideRight, right);
 }
 //Change the speed of only one side of the drive
-void driveSideWithPower(MHDriveSide side, int power){
+void driveSideWithPower(MHDriveSide side, short power){
   //We don't want to stall any of the motors
-  if((power < MHMotorPowerStall && power > 0) || (power < -MHMotorPowerStall && power > -MHMotorPowerMax)){
+  if(abs(power) < (short)MHMotorPowerStall){
     //So we make sure to stop any power that would be in the stall zone
     power = MHMotorPowerStop;
   }
@@ -104,7 +106,7 @@ void launch(){
 }
 void holdLaunch(){
   //Stop the launch motors
-  holdLaunch();
+  launchInDirection(MHLaunchDirectionStop);
 }
 void fire(){
   //Run the entire cannon assembly in the logical direction

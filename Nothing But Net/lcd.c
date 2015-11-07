@@ -8,11 +8,6 @@
 #include "lcd.h"
 #endif
 
-//Make sure we can use battery functions
-#ifndef __BATTERY_H__
-#include "battery.h"
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////
 //MARK: - Whole Screen Functions
 ///////////////////////////////////////////////////////////////////////////////
@@ -22,7 +17,7 @@ void idleScreen(){
   //Turn off the screen backlight
   bLCDBacklight = false;
   //Display some advertisement on each line
-  print("2616F", "");
+  print("|\\/\\/|  Princess", "|____|    #2616F");
 }
 
 ///////////////////////////////////////////////////////////////////////////////

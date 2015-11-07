@@ -18,6 +18,7 @@
 #pragma userControlDuration(60)
 
 #include "Vex_Competition_Includes.h"   //Main competition background code...do not modify!
+#include "lcd.h"
 
 void drive(const short left, const short right){
 	if(abs(left) >= 30){
@@ -162,7 +163,7 @@ task autonomous(){
 
 task usercontrol(){
 	// User control code here, inside the loop
-
+	idleScreen();
 	while (true){
 	  // This is the main execution loop for the user control program. Each time through the loop
 	  // your program should update motor + servo values based on feedback from the joysticks.

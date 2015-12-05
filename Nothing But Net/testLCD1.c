@@ -151,7 +151,10 @@ void prepareScreen(MHLCDScreen *screen);
 void clearLCD();
 //Halts program execution until all buttons on the VEX LCD are released
 void waitForRelease();
+<<<<<<< HEAD
 //This sets up a screen based off of a default. It will operate on a custom screen, if a pointer to one is passed, but it defaults to nextScreen, if there is none passed.
+=======
+>>>>>>> 8a9e95f69530c0cb8ff0170776dbe5f8a1253b64
 void screenForScreenStyle(MHLCDScreenStyle style, MHLCDScreen *screen){
 	if(!*screen){
 		*screen = nextScreen;

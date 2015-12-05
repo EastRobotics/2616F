@@ -31,7 +31,6 @@
                         |____|  \___/   |_|  \___/  |__|
 */
 
-#pragma systemFile
 //ROBOTC Default Values: string = "", numbers = 536885932
 #ifndef VOLTAGE_THRESHOLD
 //We need access to Conrad's battery library, so we need to include it, if it hasn't been already

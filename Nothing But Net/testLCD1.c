@@ -151,10 +151,7 @@ void prepareScreen(MHLCDScreen *screen);
 void clearLCD();
 //Halts program execution until all buttons on the VEX LCD are released
 void waitForRelease();
-<<<<<<< HEAD
 //This sets up a screen based off of a default. It will operate on a custom screen, if a pointer to one is passed, but it defaults to nextScreen, if there is none passed.
-=======
->>>>>>> 8a9e95f69530c0cb8ff0170776dbe5f8a1253b64
 void screenForScreenStyle(MHLCDScreenStyle style, MHLCDScreen *screen){
 	if(!*screen){
 		*screen = nextScreen;
@@ -295,7 +292,15 @@ void displayScreenStyle(MHLCDScreenStyle style){
 		displayLCDVoltageString(1);
 	}
 }
-
+bool listening = false;
+task listenForLCDBack(){
+	listening = true;
+	while(nLCDButtons == MHLCDButtonNone){
+		wait1Msec(100);
+	}
+	listening = false;
+	pre_auton();
+}
 MHLCDButton pressed[2] = {MHLCDButtonNone, MHLCDButtonNone};
 /////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -306,7 +311,10 @@ MHLCDButton pressed[2] = {MHLCDButtonNone, MHLCDButtonNone};
 void pre_auton(){
   // Set bStopTasksBetweenModes to false if you want to keep user created tasks running between
   // Autonomous and Tele-Op modes. You will need to manage all user created tasks if set to false.
-  bStopTasksBetweenModes = true;
+	if(listening){
+		stopTask(listenForLCDBack);
+	}
+  bStopTasksBetweenModes = false;
 	do{
 		pressed[0] = pressed[1] = MHLCDButtonNone;
 		displayScreenStyle(MHLCDScreenStyleColorSelection);
@@ -324,6 +332,7 @@ void pre_auton(){
 			}
 		}
 	}while(pressed[0] == MHLCDButtonNone);
+	startTask(listenForLCDBack);
 	displayScreenStyle(MHLCDScreenStyleVoltage);
 }
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -347,6 +356,9 @@ void pre_auton(){
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 task autonomous(){
+	if(listening){
+		startTask(listenForLCDBack);
+	}
 	if(pressed[0] == MHLCDButtonLeft){
 	displayScreenStyle(MHLCDScreenStyleVoltage);
 	motor[rfbDrive] = -127; // drive backwards to hit bar infront of the net
@@ -737,8 +749,6 @@ task usercontrol(){
 	  else{
 	  	shootFly(0);
 	  }
-
-
 	  //launchInDirection(dir);
 	}
 }

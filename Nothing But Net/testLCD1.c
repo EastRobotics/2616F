@@ -371,6 +371,8 @@ task autonomous(){
 	motor[lfbDrive] = 0; // set all drive = 0 so it stops
 	motor[rmDrive] = 0; // set all drive = 0 so it stops
 
+	wait1Msec(10); // take a break 
+
 	motor[l1] = 67; // rev launcher up to 67 power
 	motor[l2] = 67; // rev launcher up to 67 power
 	motor[l3] = 67; // rev launcher up to 67 power
@@ -381,37 +383,37 @@ task autonomous(){
 	motor[lin] = -127; // outake for (400) Msec to launch first ball
 	motor[rin] = -127; // outake for (400) Msec to launch first ball
 
-	wait1Msec(400); // outake
+	wait1Msec(300); // outake
 
 	motor[lin] = 0; // stop outake
 	motor[rin] = 0; // stop outake
 
-	wait1Msec(250); // wait 1/4 second
+	wait1Msec(500); // wait 1/2 second
 
 	motor[lin] = -127; // outake second ball
 	motor[rin] = -127; // outake second ball
 
-	wait1Msec(700); // wait 7/10 of a second
+	wait1Msec(300); // wait 7/10 of a second
 
 	motor[lin] = 0; // stop outake
 	motor[rin] = 0; // stop outake
 
-	wait1Msec(250); // wait 1/4 second
+	wait1Msec(500); // wait 1/2 second
 
 	motor[lin] = -127; // outake
 	motor[rin] = -127; // outake
 
-	wait1Msec(700); // do it for 7/10 second
+	wait1Msec(300); // do it for 7/10 second
 
 	motor[lin] = 0; // stop outake
 	motor[rin] = 0; // stop outake
 
-	wait1Msec(250); // wait again
+	wait1Msec(500); // wait again
 
 	motor[lin] = -127; // outake
 	motor[rin] = -127; // outake
 
-	wait1Msec(1000);
+	wait1Msec(1000); // turn intake off
 
 	motor[lin] = 0; // stop outake
 	motor[rin] = 0; // stop outake
@@ -531,7 +533,7 @@ task autonomous(){
 		motor[lin] = -127; // outake for (400) Msec to launch first ball
 		motor[rin] = -127; // outake for (400) Msec to launch first ball
 
-		wait1Msec(400); // outake
+		wait1Msec(300); // outake
 
 		motor[lin] = 0; // stop outake
 		motor[rin] = 0; // stop outake
@@ -541,7 +543,7 @@ task autonomous(){
 		motor[lin] = -127; // outake second ball
 		motor[rin] = -127; // outake second ball
 
-		wait1Msec(700); // wait 7/10 of a second
+		wait1Msec(300); // wait 7/10 of a second
 
 		motor[lin] = 0; // stop outake
 		motor[rin] = 0; // stop outake
@@ -551,7 +553,7 @@ task autonomous(){
 		motor[lin] = -127; // outake
 		motor[rin] = -127; // outake
 
-		wait1Msec(700); // do it for 7/10 second
+		wait1Msec(300); // do it for 7/10 second
 
 		motor[lin] = 0; // stop outake
 		motor[rin] = 0; // stop outake
@@ -680,7 +682,7 @@ task autonomous(){
 		motor[lin] = -127; // outake for (400) Msec to launch first ball
 		motor[rin] = -127; // outake for (400) Msec to launch first ball
 
-		wait1Msec(400); // outake
+		wait1Msec(300); // outake
 
 		motor[lin] = 0; // stop outake
 		motor[rin] = 0; // stop outake
@@ -690,7 +692,7 @@ task autonomous(){
 		motor[lin] = -127; // outake second ball
 		motor[rin] = -127; // outake second ball
 
-		wait1Msec(700); // wait 7/10 of a second
+		wait1Msec(300); // wait 7/10 of a second
 
 		motor[lin] = 0; // stop outake
 		motor[rin] = 0; // stop outake
@@ -700,7 +702,7 @@ task autonomous(){
 		motor[lin] = -127; // outake
 		motor[rin] = -127; // outake
 
-		wait1Msec(700); // do it for 7/10 second
+		wait1Msec(300); // do it for 7/10 second
 
 		motor[lin] = 0; // stop outake
 		motor[rin] = 0; // stop outake

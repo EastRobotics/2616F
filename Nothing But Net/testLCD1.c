@@ -728,7 +728,7 @@ task usercontrol(){
 
 	while (true){
 
-	  drive(vexRT[Ch3], vexRT[Ch2]);
+	  drive(vexRT[Ch3], vexRT[Ch2]);//controller drive
 	  int dir = vexRT[Btn5U] ? 1 : vexRT[Btn5D] ? -1 : 0;
 	  intakeInDirection(dir);
 	  //dir = vexRT[Btn6U] ? 1 : vexRT[Btn6D] ? -1 : 0;

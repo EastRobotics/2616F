@@ -51,6 +51,7 @@ void drive(const short left, const short right){
 	//Check to make sure that the requested left side power isn't too low
 	if(abs(left) >= MH_MINIMUM_MOTOR_POWER_THRESHOLD){
 		//If not, make the left side motors run at the requested left side power
+		motor[lfbDrive] = motor[lmDrive] = left;
 	}
 	else{
 		//If it is, just stop the left side motors
@@ -371,7 +372,7 @@ task autonomous(){
 	motor[lfbDrive] = 0; // set all drive = 0 so it stops
 	motor[rmDrive] = 0; // set all drive = 0 so it stops
 
-	wait1Msec(10); // take a break 
+	wait1Msec(10); // take a break
 
 	motor[l1] = 67; // rev launcher up to 67 power
 	motor[l2] = 67; // rev launcher up to 67 power

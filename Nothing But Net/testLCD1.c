@@ -292,8 +292,13 @@ void displayScreenStyle(MHLCDScreenStyle style){
 	}
 }
 bool listening = false;
+TSemaphore listeningLock;
 task listenForLCDBack(){
+	semaphoreLock(listeningLock);
 	listening = true;
+	if(listeningLock.nOwningTask == (ubyte)nCurrentTask){
+		semaphoreUnlock(listeningLock);
+	}
 	while(nLCDButtons == MHLCDButtonNone){
 		wait1Msec(100);
 	}
@@ -308,9 +313,15 @@ MHLCDButton pressed[2] = {MHLCDButtonNone, MHLCDButtonNone};
 /////////////////////////////////////////////////////////////////////////////////////////
 
 void pre_auton(){
-  // Set bStopTasksBetweenModes to false if you want to keep user created tasks running between
-  // Autonomous and Tele-Op modes. You will need to manage all user created tasks if set to false.
+	static bool lockInitialized = false;
+	if(!lockInitialized){
+		semaphoreInitialize(listeningLock);
+	}
+	semaphoreLock(listeningLock);
 	if(listening){
+		if(listeningLock.nOwningTask == (ubyte)nCurrentTask){
+			semaphoreUnlock(listeningLock);
+		}
 		stopTask(listenForLCDBack);
 	}
   bStopTasksBetweenModes = false;
@@ -355,7 +366,11 @@ void pre_auton(){
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 task autonomous(){
+	semaphoreLock(listeningLock);
 	if(listening){
+		if(listeningLock.nOwningTask == (ubyte)nCurrentTask){
+			semaphoreUnlock(listeningLock);
+		}
 		startTask(listenForLCDBack);
 	}
 	if(pressed[0] == MHLCDButtonLeft){

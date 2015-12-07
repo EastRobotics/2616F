@@ -1,13 +1,13 @@
 #pragma systemFile
 #define VOLTAGE_THRESHOLD 1250
-void displayLCDVoltageString(int line);
+void displayLCDVoltageString(const int line);
 void displayVoltage(int line, int position, int millivolts, bool leftAligned);
 void LCDVoltageString(string *text, int batteryLevel);
 void LCDVoltageLine(string *line);
 void displayLCDVoltageString(int line){
 	bLCDBacklight = false;
 	clearLCDLine(line);
-	int otherBatteryLevel = (float)SensorValue[otherBattery] * 1000 / 280;
+	int otherBatteryLevel = (float)BackupBatteryLevel * 1000 / 280;
 	displayVoltage(line, 0, nImmediateBatteryLevel, true);
 	displayVoltage(line, 11, otherBatteryLevel, false);
 }
@@ -36,23 +36,15 @@ void LCDVoltageLine(string *line){
 	string primary;
 	string other;
 	LCDVoltageString(&primary, nImmediateBatteryLevel);
-	LCDVoltageString(&other, SensorValue[otherBattery]);
-	int length = strlen(primary) + strlen(other);
-	switch(length){
-		case 10:
-			//Strings in ROBOTC must be added one at a time, because ROBOTC is stupid
-			*line = primary + "      ";
-			*line += other;
-			return;
-		case 9:
-			*line = primary + "       ";
-			*line += other;
-			return;
-		case 8:
-			*line = primary + "        ";
-			*line += other;
-			return;
-		default:
-			*line = " Battery Error  ";
+	LCDVoltageString(&other, BackupBatteryLevel);
+	const int backupLength = strlen(other);
+	*line = primary;
+	for(int i = 0; i < ((backupLength + strlen(primary)) - 4) / 2; ++i){
+		*line += " ";
 	}
+	*line += "Back"
+	for(int i = 0; i < 16 - (strlen(*line) + backupLength); ++i){
+		*line += " ";
+	}
+	*line += other;
 }

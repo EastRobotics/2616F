@@ -300,8 +300,9 @@ task listenForLCDBack(){
 		semaphoreUnlock(listeningLock);
 	}
 	while(nLCDButtons == MHLCDButtonNone){
-		wait1Msec(100);
+		wait1Msec(50);
 	}
+	waitForRelease();
 	listening = false;
 	pre_auton();
 }
@@ -373,66 +374,66 @@ task autonomous(){
 		}
 		startTask(listenForLCDBack);
 	}
-	if(pressed[0] == MHLCDButtonLeft){
 	displayScreenStyle(MHLCDScreenStyleVoltage);
-	motor[rfbDrive] = -127; // drive backwards to hit bar infront of the net
-	motor[lmDrive] = -127; // drive backwards to hit bar infront of the net
-	motor[lfbDrive] = -127; // drive backwards to hit bar infront of the net
-	motor[rmDrive] = -127; // drive backwards to hit bar infront of the net
+	if(pressed[0] == MHLCDButtonLeft){
+		motor[rfbDrive] = -127; // drive backwards to hit bar infront of the net
+		motor[lmDrive] = -127; // drive backwards to hit bar infront of the net
+		motor[lfbDrive] = -127; // drive backwards to hit bar infront of the net
+		motor[rmDrive] = -127; // drive backwards to hit bar infront of the net
 
-	wait1Msec(3250); // drive backwards
+		wait1Msec(3250); // drive backwards
 
-	motor[rfbDrive] = 0; // set all drive = 0 so it stops
-	motor[lmDrive] = 0; // set all drive = 0 so it stops
-	motor[lfbDrive] = 0; // set all drive = 0 so it stops
-	motor[rmDrive] = 0; // set all drive = 0 so it stops
+		motor[rfbDrive] = 0; // set all drive = 0 so it stops
+		motor[lmDrive] = 0; // set all drive = 0 so it stops
+		motor[lfbDrive] = 0; // set all drive = 0 so it stops
+		motor[rmDrive] = 0; // set all drive = 0 so it stops
 
-	wait1Msec(10); // take a break
+		wait1Msec(10); // take a break
 
-	motor[l1] = 67; // rev launcher up to 67 power
-	motor[l2] = 67; // rev launcher up to 67 power
-	motor[l3] = 67; // rev launcher up to 67 power
-	motor[l4] = 67; // rev launcher up to 67 power
+		motor[l1] = 67; // rev launcher up to 67 power
+		motor[l2] = 67; // rev launcher up to 67 power
+		motor[l3] = 67; // rev launcher up to 67 power
+		motor[l4] = 67; // rev launcher up to 67 power
 
-	wait1Msec(3000); // ramp up launcher
+		wait1Msec(3000); // ramp up launcher
 
-	motor[lin] = -127; // outake for (400) Msec to launch first ball
-	motor[rin] = -127; // outake for (400) Msec to launch first ball
+		motor[lin] = -127; // outake for (400) Msec to launch first ball
+		motor[rin] = -127; // outake for (400) Msec to launch first ball
 
-	wait1Msec(300); // outake
+		wait1Msec(300); // outake
 
-	motor[lin] = 0; // stop outake
-	motor[rin] = 0; // stop outake
+		motor[lin] = 0; // stop outake
+		motor[rin] = 0; // stop outake
 
-	wait1Msec(500); // wait 1/2 second
+		wait1Msec(500); // wait 1/2 second
 
-	motor[lin] = -127; // outake second ball
-	motor[rin] = -127; // outake second ball
+		motor[lin] = -127; // outake second ball
+		motor[rin] = -127; // outake second ball
 
-	wait1Msec(300); // wait 7/10 of a second
+		wait1Msec(300); // wait 7/10 of a second
 
-	motor[lin] = 0; // stop outake
-	motor[rin] = 0; // stop outake
+		motor[lin] = 0; // stop outake
+		motor[rin] = 0; // stop outake
 
-	wait1Msec(500); // wait 1/2 second
+		wait1Msec(500); // wait 1/2 second
 
-	motor[lin] = -127; // outake
-	motor[rin] = -127; // outake
+		motor[lin] = -127; // outake
+		motor[rin] = -127; // outake
 
-	wait1Msec(300); // do it for 7/10 second
+		wait1Msec(300); // do it for 7/10 second
 
-	motor[lin] = 0; // stop outake
-	motor[rin] = 0; // stop outake
+		motor[lin] = 0; // stop outake
+		motor[rin] = 0; // stop outake
 
-	wait1Msec(500); // wait again
+		wait1Msec(500); // wait again
 
-	motor[lin] = -127; // outake
-	motor[rin] = -127; // outake
+		motor[lin] = -127; // outake
+		motor[rin] = -127; // outake
 
-	wait1Msec(1000); // turn intake off
+		wait1Msec(1000); // turn intake off
 
-	motor[lin] = 0; // stop outake
-	motor[rin] = 0; // stop outake
+		motor[lin] = 0; // stop outake
+		motor[rin] = 0; // stop outake
 
 	/////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -613,74 +614,74 @@ task autonomous(){
 		motor[lfbDrive] = 0; // set all drive = 0 so it stops
 		motor[rmDrive] = 0; // set all drive = 0 so it stops
 
-	wait1Msec(10); // mg
+		wait1Msec(10); // mg
 
-	motor[rfbDrive] = -127; // turn
-	motor[lmDrive] = 127; //
-	motor[lfbDrive] = 127; //
-	motor[rmDrive] = -127; //
+		motor[rfbDrive] = -127; // turn
+		motor[lmDrive] = 127; //
+		motor[lfbDrive] = 127; //
+		motor[rmDrive] = -127; //
 
-	wait1Msec(300);
+		wait1Msec(300);
 
-	motor[rfbDrive] = 0; // set all drive = 0 so it stops
-	motor[lmDrive] = 0; // set all drive = 0 so it stops
-	motor[lfbDrive] = 0; // set all drive = 0 so it stops
-	motor[rmDrive] = 0; // set all drive = 0 so it stops
+		motor[rfbDrive] = 0; // set all drive = 0 so it stops
+		motor[lmDrive] = 0; // set all drive = 0 so it stops
+		motor[lfbDrive] = 0; // set all drive = 0 so it stops
+		motor[rmDrive] = 0; // set all drive = 0 so it stops
 
-	wait1Msec(10); // mg
+		wait1Msec(10); // mg
 
-	motor[rfbDrive] = -127; // drive backwards
-	motor[lmDrive] = -127; // drive backwards
-	motor[lfbDrive] = -127; // drive backwards
-	motor[rmDrive] = -127; // drive backwards
+		motor[rfbDrive] = -127; // drive backwards
+		motor[lmDrive] = -127; // drive backwards
+		motor[lfbDrive] = -127; // drive backwards
+		motor[rmDrive] = -127; // drive backwards
 
-	wait1Msec(2250); // drive backwards
+		wait1Msec(2250); // drive backwards
 
-	motor[rfbDrive] = 0; // set all drive = 0 so it stops
-	motor[lmDrive] = 0; // set all drive = 0 so it stops
-	motor[lfbDrive] = 0; // set all drive = 0 so it stops
-	motor[rmDrive] = 0; // set all drive = 0 so it stops
+		motor[rfbDrive] = 0; // set all drive = 0 so it stops
+		motor[lmDrive] = 0; // set all drive = 0 so it stops
+		motor[lfbDrive] = 0; // set all drive = 0 so it stops
+		motor[rmDrive] = 0; // set all drive = 0 so it stops
 
-	wait1Msec(10); // mg
+		wait1Msec(10); // mg
 
-	motor[rfbDrive] = 127; // turn other way
-	motor[lfbDrive] = -127; //
-	motor[rmDrive] = 127; //
+		motor[rfbDrive] = 127; // turn other way
+		motor[lfbDrive] = -127; //
+		motor[rmDrive] = 127; //
 
-	wait1Msec(250);
+		wait1Msec(250);
 
-	motor[rfbDrive] = 0; // set all drive = 0 so it stops
-	motor[lmDrive] = 0; // set all drive = 0 so it stops
-	motor[lfbDrive] = 0; // set all drive = 0 so it stops
-	motor[rmDrive] = 0; // set all drive = 0 so it stops
+		motor[rfbDrive] = 0; // set all drive = 0 so it stops
+		motor[lmDrive] = 0; // set all drive = 0 so it stops
+		motor[lfbDrive] = 0; // set all drive = 0 so it stops
+		motor[rmDrive] = 0; // set all drive = 0 so it stops
 
-	wait1Msec(10); // mg
+		wait1Msec(10); // mg
 
-	motor[rfbDrive] = -127; // drive backwards
-	motor[lmDrive] = -127; // drive backwards
-	motor[lfbDrive] = -127; // drive backwards
-	motor[rmDrive] = -127; // drive backwards
+		motor[rfbDrive] = -127; // drive backwards
+		motor[lmDrive] = -127; // drive backwards
+		motor[lfbDrive] = -127; // drive backwards
+		motor[rmDrive] = -127; // drive backwards
 
-	wait1Msec(500); // drive backwards
+		wait1Msec(500); // drive backwards
 
-	motor[rfbDrive] = 0; // set all drive = 0 so it stops
-	motor[lmDrive] = 0; // set all drive = 0 so it stops
-	motor[lfbDrive] = 0; // set all drive = 0 so it stops
-	motor[rmDrive] = 0; // set all drive = 0 so it stops
+		motor[rfbDrive] = 0; // set all drive = 0 so it stops
+		motor[lmDrive] = 0; // set all drive = 0 so it stops
+		motor[lfbDrive] = 0; // set all drive = 0 so it stops
+		motor[rmDrive] = 0; // set all drive = 0 so it stops
 
-	wait1Msec(10); // mg
+		wait1Msec(10); // mg
 
-	motor[lfbDrive] = -127; // drive left side ONLY backwards
-	motor[lmDrive] = -127; // drive left side ONLY backwards
+		motor[lfbDrive] = -127; // drive left side ONLY backwards
+		motor[lmDrive] = -127; // drive left side ONLY backwards
 
-	wait1Msec(250); // drive backwards
+		wait1Msec(250); // drive backwards
 
-	motor[rfbDrive] = 0; // set all drive = 0 so it stops
-	motor[lmDrive] = 0; // set all drive = 0 so it stops
-	motor[lfbDrive] = 0; // set all drive = 0 so it stops
-	motor[rmDrive] = 0; // set all drive = 0 so it stops
+		motor[rfbDrive] = 0; // set all drive = 0 so it stops
+		motor[lmDrive] = 0; // set all drive = 0 so it stops
+		motor[lfbDrive] = 0; // set all drive = 0 so it stops
+		motor[rmDrive] = 0; // set all drive = 0 so it stops
 
-	wait1Msec(10); // mg
+		wait1Msec(10); // mg
 
 	//////////////////
 	//
@@ -743,7 +744,7 @@ task autonomous(){
 //////////////////////////////////////////////////////////////////////////////////////////
 task usercontrol(){
 	// User convtrol code here, inside the loop
-
+	displayScreenStyle(MHLCDScreenStyleVoltage);
 	while (true){
 
 	  drive(vexRT[Ch3], vexRT[Ch2]);//controller drive

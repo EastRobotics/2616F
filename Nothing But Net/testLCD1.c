@@ -22,7 +22,6 @@
                                 			2616F
 																Frightening Lighting
 
-
 												 ___      __    __     __    _______
 											  |__ \    / /   /_ |   / /   |   ____|
   												 ) |  / /_    | |  / /_   |  |__
@@ -31,7 +30,6 @@
                         |____|  \___/   |_|  \___/  |__|
 */
 
-#pragma systemFile
 //ROBOTC Default Values: string = "", numbers = 536885932
 #ifndef VOLTAGE_THRESHOLD
 //We need access to Conrad's battery library, so we need to include it, if it hasn't been already
@@ -53,6 +51,7 @@ void drive(const short left, const short right){
 	//Check to make sure that the requested left side power isn't too low
 	if(abs(left) >= MH_MINIMUM_MOTOR_POWER_THRESHOLD){
 		//If not, make the left side motors run at the requested left side power
+		motor[lfbDrive] = motor[lmDrive] = left;
 	}
 	else{
 		//If it is, just stop the left side motors
@@ -151,10 +150,7 @@ void prepareScreen(MHLCDScreen *screen);
 void clearLCD();
 //Halts program execution until all buttons on the VEX LCD are released
 void waitForRelease();
-<<<<<<< HEAD
 //This sets up a screen based off of a default. It will operate on a custom screen, if a pointer to one is passed, but it defaults to nextScreen, if there is none passed.
-=======
->>>>>>> 8a9e95f69530c0cb8ff0170776dbe5f8a1253b64
 void screenForScreenStyle(MHLCDScreenStyle style, MHLCDScreen *screen){
 	if(!*screen){
 		*screen = nextScreen;
@@ -295,7 +291,20 @@ void displayScreenStyle(MHLCDScreenStyle style){
 		displayLCDVoltageString(1);
 	}
 }
-
+bool listening = false;
+TSemaphore listeningLock;
+task listenForLCDBack(){
+	semaphoreLock(listeningLock);
+	listening = true;
+	if(listeningLock.nOwningTask == (ubyte)nCurrentTask){
+		semaphoreUnlock(listeningLock);
+	}
+	while(nLCDButtons == MHLCDButtonNone){
+		wait1Msec(100);
+	}
+	listening = false;
+	pre_auton();
+}
 MHLCDButton pressed[2] = {MHLCDButtonNone, MHLCDButtonNone};
 /////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -304,9 +313,18 @@ MHLCDButton pressed[2] = {MHLCDButtonNone, MHLCDButtonNone};
 /////////////////////////////////////////////////////////////////////////////////////////
 
 void pre_auton(){
-  // Set bStopTasksBetweenModes to false if you want to keep user created tasks running between
-  // Autonomous and Tele-Op modes. You will need to manage all user created tasks if set to false.
-  bStopTasksBetweenModes = true;
+	static bool lockInitialized = false;
+	if(!lockInitialized){
+		semaphoreInitialize(listeningLock);
+	}
+	semaphoreLock(listeningLock);
+	if(listening){
+		if(listeningLock.nOwningTask == (ubyte)nCurrentTask){
+			semaphoreUnlock(listeningLock);
+		}
+		stopTask(listenForLCDBack);
+	}
+  bStopTasksBetweenModes = false;
 	do{
 		pressed[0] = pressed[1] = MHLCDButtonNone;
 		displayScreenStyle(MHLCDScreenStyleColorSelection);
@@ -324,6 +342,7 @@ void pre_auton(){
 			}
 		}
 	}while(pressed[0] == MHLCDButtonNone);
+	startTask(listenForLCDBack);
 	displayScreenStyle(MHLCDScreenStyleVoltage);
 }
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -347,6 +366,13 @@ void pre_auton(){
 //
 /////////////////////////////////////////////////////////////////////////////////////////
 task autonomous(){
+	semaphoreLock(listeningLock);
+	if(listening){
+		if(listeningLock.nOwningTask == (ubyte)nCurrentTask){
+			semaphoreUnlock(listeningLock);
+		}
+		startTask(listenForLCDBack);
+	}
 	if(pressed[0] == MHLCDButtonLeft){
 	displayScreenStyle(MHLCDScreenStyleVoltage);
 	motor[rfbDrive] = -127; // drive backwards to hit bar infront of the net
@@ -361,6 +387,8 @@ task autonomous(){
 	motor[lfbDrive] = 0; // set all drive = 0 so it stops
 	motor[rmDrive] = 0; // set all drive = 0 so it stops
 
+	wait1Msec(10); // take a break
+
 	motor[l1] = 67; // rev launcher up to 67 power
 	motor[l2] = 67; // rev launcher up to 67 power
 	motor[l3] = 67; // rev launcher up to 67 power
@@ -371,37 +399,37 @@ task autonomous(){
 	motor[lin] = -127; // outake for (400) Msec to launch first ball
 	motor[rin] = -127; // outake for (400) Msec to launch first ball
 
-	wait1Msec(400); // outake
+	wait1Msec(300); // outake
 
 	motor[lin] = 0; // stop outake
 	motor[rin] = 0; // stop outake
 
-	wait1Msec(250); // wait 1/4 second
+	wait1Msec(500); // wait 1/2 second
 
 	motor[lin] = -127; // outake second ball
 	motor[rin] = -127; // outake second ball
 
-	wait1Msec(700); // wait 7/10 of a second
+	wait1Msec(300); // wait 7/10 of a second
 
 	motor[lin] = 0; // stop outake
 	motor[rin] = 0; // stop outake
 
-	wait1Msec(250); // wait 1/4 second
+	wait1Msec(500); // wait 1/2 second
 
 	motor[lin] = -127; // outake
 	motor[rin] = -127; // outake
 
-	wait1Msec(700); // do it for 7/10 second
+	wait1Msec(300); // do it for 7/10 second
 
 	motor[lin] = 0; // stop outake
 	motor[rin] = 0; // stop outake
 
-	wait1Msec(250); // wait again
+	wait1Msec(500); // wait again
 
 	motor[lin] = -127; // outake
 	motor[rin] = -127; // outake
 
-	wait1Msec(1000);
+	wait1Msec(1000); // turn intake off
 
 	motor[lin] = 0; // stop outake
 	motor[rin] = 0; // stop outake
@@ -521,7 +549,7 @@ task autonomous(){
 		motor[lin] = -127; // outake for (400) Msec to launch first ball
 		motor[rin] = -127; // outake for (400) Msec to launch first ball
 
-		wait1Msec(400); // outake
+		wait1Msec(300); // outake
 
 		motor[lin] = 0; // stop outake
 		motor[rin] = 0; // stop outake
@@ -531,7 +559,7 @@ task autonomous(){
 		motor[lin] = -127; // outake second ball
 		motor[rin] = -127; // outake second ball
 
-		wait1Msec(700); // wait 7/10 of a second
+		wait1Msec(300); // wait 7/10 of a second
 
 		motor[lin] = 0; // stop outake
 		motor[rin] = 0; // stop outake
@@ -541,7 +569,7 @@ task autonomous(){
 		motor[lin] = -127; // outake
 		motor[rin] = -127; // outake
 
-		wait1Msec(700); // do it for 7/10 second
+		wait1Msec(300); // do it for 7/10 second
 
 		motor[lin] = 0; // stop outake
 		motor[rin] = 0; // stop outake
@@ -670,7 +698,7 @@ task autonomous(){
 		motor[lin] = -127; // outake for (400) Msec to launch first ball
 		motor[rin] = -127; // outake for (400) Msec to launch first ball
 
-		wait1Msec(400); // outake
+		wait1Msec(300); // outake
 
 		motor[lin] = 0; // stop outake
 		motor[rin] = 0; // stop outake
@@ -680,7 +708,7 @@ task autonomous(){
 		motor[lin] = -127; // outake second ball
 		motor[rin] = -127; // outake second ball
 
-		wait1Msec(700); // wait 7/10 of a second
+		wait1Msec(300); // wait 7/10 of a second
 
 		motor[lin] = 0; // stop outake
 		motor[rin] = 0; // stop outake
@@ -690,7 +718,7 @@ task autonomous(){
 		motor[lin] = -127; // outake
 		motor[rin] = -127; // outake
 
-		wait1Msec(700); // do it for 7/10 second
+		wait1Msec(300); // do it for 7/10 second
 
 		motor[lin] = 0; // stop outake
 		motor[rin] = 0; // stop outake
@@ -718,7 +746,7 @@ task usercontrol(){
 
 	while (true){
 
-	  drive(vexRT[Ch3], vexRT[Ch2]);
+	  drive(vexRT[Ch3], vexRT[Ch2]);//controller drive
 	  int dir = vexRT[Btn5U] ? 1 : vexRT[Btn5D] ? -1 : 0;
 	  intakeInDirection(dir);
 	  //dir = vexRT[Btn6U] ? 1 : vexRT[Btn6D] ? -1 : 0;
@@ -737,8 +765,6 @@ task usercontrol(){
 	  else{
 	  	shootFly(0);
 	  }
-
-
 	  //launchInDirection(dir);
 	}
 }

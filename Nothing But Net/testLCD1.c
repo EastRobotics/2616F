@@ -316,6 +316,7 @@ void pre_auton(){
 	static bool lockInitialized = false;
 	if(!lockInitialized){
 		semaphoreInitialize(listeningLock);
+		lockInitialized = true;
 	}
 	semaphoreLock(listeningLock);
 	if(listening){

@@ -42,7 +42,7 @@ void LCDVoltageLine(string *line){
 	for(int i = 0; i < ((backupLength + strlen(primary)) - 4) / 2; ++i){
 		*line += " ";
 	}
-	*line += "Back"
+	*line += "Back";
 	for(int i = 0; i < 16 - (strlen(*line) + backupLength); ++i){
 		*line += " ";
 	}

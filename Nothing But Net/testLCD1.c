@@ -1,4 +1,3 @@
-#pragma config(Sensor, in1,    otherBattery,   sensorAnalog)
 #pragma config(Motor,  port1,           lmDrive,       tmotorVex393TurboSpeed_HBridge, openLoop, driveLeft)
 #pragma config(Motor,  port2,           lin,           tmotorVex393HighSpeed_MC29, openLoop)
 #pragma config(Motor,  port3,           l2,            tmotorVex393TurboSpeed_MC29, openLoop)
@@ -296,7 +295,7 @@ TSemaphore listeningLock;
 task listenForLCDBack(){
 	semaphoreLock(listeningLock);
 	listening = true;
-	if(listeningLock.nOwningTask == (ubyte)nCurrentTask){
+	if(bDoesTaskOwnSemaphore(listeningLock)){
 		semaphoreUnlock(listeningLock);
 	}
 	while(nLCDButtons == MHLCDButtonNone){
@@ -320,7 +319,7 @@ void pre_auton(){
 	}
 	semaphoreLock(listeningLock);
 	if(listening){
-		if(listeningLock.nOwningTask == (ubyte)nCurrentTask){
+		if(bDoesTaskOwnSemaphore(listeningLock)){
 			semaphoreUnlock(listeningLock);
 		}
 		stopTask(listenForLCDBack);
@@ -368,14 +367,19 @@ void pre_auton(){
 /////////////////////////////////////////////////////////////////////////////////////////
 task autonomous(){
 	semaphoreLock(listeningLock);
-	if(listening){
-		if(listeningLock.nOwningTask == (ubyte)nCurrentTask){
+	if(!listening){
+		if(bDoesTaskOwnSemaphore(listeningLock)){
 			semaphoreUnlock(listeningLock);
 		}
 		startTask(listenForLCDBack);
 	}
+	if(bDoesTaskOwnSemaphore(listeningLock)){
+			semaphoreUnlock(listeningLock);
+	}
 	displayScreenStyle(MHLCDScreenStyleVoltage);
+	displayLCDCenteredString(0, "Running Auton:");
 	if(pressed[0] == MHLCDButtonLeft){
+		displayLCDCenteredString(1, "Regular");
 		motor[rfbDrive] = -127; // drive backwards to hit bar infront of the net
 		motor[lmDrive] = -127; // drive backwards to hit bar infront of the net
 		motor[lfbDrive] = -127; // drive backwards to hit bar infront of the net
@@ -452,6 +456,7 @@ task autonomous(){
 
 	}
 	else if(pressed[0] == MHLCDButtonRight && pressed[1] == MHLCDButtonLeft){
+		displayLCDCenteredString(1, "Red Block");
 		motor[rfbDrive] = -127; // drive backwards
 		motor[lmDrive] = -127; // drive backwards
 		motor[lfbDrive] = -127; // drive backwards
@@ -602,6 +607,7 @@ task autonomous(){
 	/////////////////////////////////////////////////////////////////////////////////////////
 
 	else if(pressed[0] == MHLCDButtonRight && pressed[1] == MHLCDButtonRight){
+		displayLCDCenteredString(1, "Blue Block");
 		motor[rfbDrive] = -127; // drive backwards
 		motor[lmDrive] = -127; // drive backwards
 		motor[lfbDrive] = -127; // drive backwards
@@ -733,6 +739,9 @@ task autonomous(){
 
 		motor[lin] = 0; // stop outake
 		motor[rin] = 0; // stop outake
+	}
+	else{
+		displayLCDCenteredString(1, "None");
 	}
 	displayScreenStyle(MHLCDScreenStyleVoltage);
 }

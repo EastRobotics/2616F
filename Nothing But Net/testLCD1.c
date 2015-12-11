@@ -762,16 +762,16 @@ task usercontrol(){
 	  intakeInDirection(dir);
 	  //dir = vexRT[Btn6U] ? 1 : vexRT[Btn6D] ? -1 : 0;
 	  if (vexRT[Btn8L] == 1){
-	  	shootFly(70);
+	  	shootFly(68);
 	  }
 	  else if (vexRT[Btn8U] == 1){
-	  	shootFly(90);
+	  	shootFly(70);
 	  }
 		else if (vexRT[Btn8R] == 1){
-			shootFly(100);
+			shootFly(72);
 		}
 		else if (vexRT[Btn8D] == 1){
-			shootFly(127);
+			shootFly(90);
 		}
 	  else{
 	  	shootFly(0);

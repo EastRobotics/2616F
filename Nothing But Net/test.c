@@ -19,6 +19,20 @@
 
 #include "Vex_Competition_Includes.h"   //Main competition background code...do not modify!
 
+
+/*
+                                			2616F
+																Frightening Lighting
+
+												 ___      __    __     __    _______
+											  |__ \    / /   /_ |   / /   |   ____|
+  												 ) |  / /_    | |  / /_   |  |__
+                          / /  | '_ \   | | | '_ \  |   __|
+                         / /_  | (_) |  | | | (_) | |  |
+                        |____|  \___/   |_|  \___/  |__|
+*/
+
+
 void drive(const short left, const short right){
 	if(abs(left) >= 30){
 		motor[lfbDrive] = motor[lmDrive] = left; // sets all 3 left drive motors to left
@@ -85,47 +99,49 @@ task autonomous()
 	motor[lfbDrive] = 0; // set all drive = 0 so it stops
 	motor[rmDrive] = 0; // set all drive = 0 so it stops
 
-	motor[l1] = 67; // rev launcher up to 67 power
-	motor[l2] = 67; // rev launcher up to 67 power
-	motor[l3] = 67; // rev launcher up to 67 power
-	motor[l4] = 67; // rev launcher up to 67 power
+	wait1Msec(10); // take a break
+
+	motor[l1] = 72; // rev launcher up to 67 power
+	motor[l2] = 72; // rev launcher up to 67 power
+	motor[l3] = 72; // rev launcher up to 67 power
+	motor[l4] = 72; // rev launcher up to 67 power
 
 	wait1Msec(3000); // ramp up launcher
 
 	motor[lin] = -127; // outake for (400) Msec to launch first ball
 	motor[rin] = -127; // outake for (400) Msec to launch first ball
 
-	wait1Msec(400); // outake
+	wait1Msec(300); // outake
 
 	motor[lin] = 0; // stop outake
 	motor[rin] = 0; // stop outake
 
-	wait1Msec(250); // wait 1/4 second
+	wait1Msec(500); // wait 1/2 second
 
 	motor[lin] = -127; // outake second ball
 	motor[rin] = -127; // outake second ball
 
-	wait1Msec(700); // wait 7/10 of a second
+	wait1Msec(300); // wait 7/10 of a second
 
 	motor[lin] = 0; // stop outake
 	motor[rin] = 0; // stop outake
 
-	wait1Msec(250); // wait 1/4 second
+	wait1Msec(500); // wait 1/2 second
 
 	motor[lin] = -127; // outake
 	motor[rin] = -127; // outake
 
-	wait1Msec(700); // do it for 7/10 second
+	wait1Msec(300); // do it for 7/10 second
 
 	motor[lin] = 0; // stop outake
 	motor[rin] = 0; // stop outake
 
-	wait1Msec(250); // wait again
+	wait1Msec(500); // wait again
 
 	motor[lin] = -127; // outake
 	motor[rin] = -127; // outake
 
-	wait1Msec(1000);
+	wait1Msec(1000); // final outtake 
 
 	motor[lin] = 0; // stop outake
 	motor[rin] = 0; // stop outake
@@ -139,10 +155,10 @@ task autonomous()
 //////////////////////////////////////////////////////////////////////////////////////////
 task usercontrol(){
 	// User convtrol code here, inside the loop
-
+	displayScreenStyle(MHLCDScreenStyleVoltage);
 	while (true){
 
-	  drive(vexRT[Ch3], vexRT[Ch2]);
+	  drive(vexRT[Ch3], vexRT[Ch2]);//controller drive
 	  int dir = vexRT[Btn5U] ? 1 : vexRT[Btn5D] ? -1 : 0;
 	  intakeInDirection(dir);
 	  //dir = vexRT[Btn6U] ? 1 : vexRT[Btn6D] ? -1 : 0;
@@ -150,39 +166,17 @@ task usercontrol(){
 	  	shootFly(68);
 	  }
 	  else if (vexRT[Btn8U] == 1){
-	  	shootFly(90);
+	  	shootFly(70);
 	  }
 		else if (vexRT[Btn8R] == 1){
-			shootFly(100);
+			shootFly(72);
 		}
 		else if (vexRT[Btn8D] == 1){
-			shootFly(127);
+			shootFly(90);
 		}
 	  else{
 	  	shootFly(0);
 	  }
-
-
 	  //launchInDirection(dir);
 	}
 }
-/////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////
-/*
-                                			2616F
-																Frightening Lighting
-
-
-												 ___      __    __     __    _______
-											  |__ \    / /   /_ |   / /   |   ____|
-  												 ) |  / /_    | |  / /_   |  |__
-                          / /  | '_ \   | | | '_ \  |   __|
-                         / /_  | (_) |  | | | (_) | |  |
-                        |____|  \___/   |_|  \___/  |__|

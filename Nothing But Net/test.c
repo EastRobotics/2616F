@@ -101,10 +101,10 @@ task autonomous()
 
 	wait1Msec(10); // take a break
 
-	motor[l1] = 72; // rev launcher up to 67 power
-	motor[l2] = 72; // rev launcher up to 67 power
-	motor[l3] = 72; // rev launcher up to 67 power
-	motor[l4] = 72; // rev launcher up to 67 power
+	motor[l1] = 68; // rev launcher up to 68 power
+	motor[l2] = 68; // rev launcher up to 68 power
+	motor[l3] = 68; // rev launcher up to 68 power
+	motor[l4] = 68; // rev launcher up to 68 power
 
 	wait1Msec(3000); // ramp up launcher
 
@@ -141,7 +141,7 @@ task autonomous()
 	motor[lin] = -127; // outake
 	motor[rin] = -127; // outake
 
-	wait1Msec(1000); // final outtake 
+	wait1Msec(1000); // final outtake
 
 	motor[lin] = 0; // stop outake
 	motor[rin] = 0; // stop outake

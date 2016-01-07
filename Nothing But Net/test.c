@@ -19,6 +19,65 @@
 
 #include "Vex_Competition_Includes.h"   //Main competition background code...do not modify!
 
+#ifndef  _GETLCDBUTTONS
+#define  _GETLCDBUTTONS
+
+// Some utility strings
+#define LEFT_ARROW  247
+#define RIGHT_ARROW 246
+static  char l_arr_str[4] = { LEFT_ARROW,  LEFT_ARROW,  LEFT_ARROW,  0};
+static  char r_arr_str[4] = { RIGHT_ARROW, RIGHT_ARROW, RIGHT_ARROW, 0};
+
+/*-----------------------------------------------------------------------------*/
+/*  This function is used to get the LCD hutton status but also acts as a      */
+/*  "wait for button release" feature.                                         */
+/*  Use it in place of nLcdButtons.                                            */
+/*  The function blocks until a button is pressed.                             */
+/*-----------------------------------------------------------------------------*/
+
+// Little macro to keep code cleaner, masks both disable/ebable and auton/driver
+#define vexCompetitionState (nVexRCReceiveState & (vrDisabled | vrAutonomousMode))
+
+TControllerButtons
+getLcdButtons()
+{
+    TVexReceiverState   competitionState = vexCompetitionState;
+    TControllerButtons  buttons;
+
+    // This function will block until either
+    // 1. A button is pressd on the LCD
+    //    If a button is pressed when the function starts then that button
+    //    must be released before a new button is detected.
+    // 2. Robot competition state changes
+
+    // Wait for all buttons to be released
+    while( nLCDButtons != kButtonNone ) {
+        // check competition state, bail if it changes
+        if( vexCompetitionState != competitionState )
+            return( kButtonNone );
+        wait1Msec(10);
+        }
+
+    // block until an LCD button is pressed
+    do  {
+        // we use a copy of the lcd buttons to avoid their state changing
+        // between the test and returning the status
+        buttons = nLCDButtons;
+
+        // check competition state, bail if it changes
+        if( vexCompetitionState != competitionState )
+            return( kButtonNone );
+
+        wait1Msec(10);
+        } while( buttons == kButtonNone );
+
+    return( buttons );
+}
+
+#endif  // _GETLCDBUTTONS
+
+static int MyAutonomous = 0;
+
 
 /*
                                 			2616F
@@ -63,6 +122,73 @@ void shootFly (int speed)
 	motor[l3] = (speed);
 	motor[l4] = (speed);
 }
+void LcdSetAutonomous( int value )
+{
+    // Simple selection display
+    if( value == 0 ) {
+        clearLCDLine(0);
+        clearLCDLine(1);
+    		wait1Msec(100);
+    		displayLCDString(0, 0, "Shoot");
+        displayLCDString(1, 0, "Running Shot");
+        }
+    if( value == 1 ) {
+        clearLCDLine(0);
+        clearLCDLine(1);
+    		wait1Msec(100);
+    		displayLCDString(0, 0, "Red");
+        displayLCDString(1, 0, "Running Red");
+        }
+    if( value == 2 ) {
+        clearLCDLine(0);
+        clearLCDLine(1);
+    		wait1Msec(100);
+    		displayLCDString(0, 0, "Blue");
+        displayLCDString(1, 0, "Running Blue");
+        }
+
+    // Save autonomous mode for later
+    MyAutonomous = value;
+}
+
+/*-----------------------------------------------------------------------------*/
+/*  Select one of three autonomous choices                                     */
+/*-----------------------------------------------------------------------------*/
+
+void
+LcdAutonomousSelection()
+{
+    TControllerButtons  button;
+
+    // Clear LCD and turn on backlight
+    clearLCDLine(0);
+    clearLCDLine(1);
+    bLCDBacklight = true;
+
+    // diaplay default choice
+    LcdSetAutonomous(0);
+
+    while( bIfiRobotDisabled )
+        {
+        // this function blocks until button is pressed
+        button = getLcdButtons();
+
+        // Display and select the autonomous routine
+        if( button == kButtonLeft )
+            LcdSetAutonomous(0);
+
+        if( button == kButtonCenter )
+            LcdSetAutonomous(1);
+
+        if( button == kButtonRight )
+            LcdSetAutonomous(2);
+
+        // Don't hog the cpu !
+        wait1Msec(10);
+        }
+
+
+  }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -87,64 +213,378 @@ void pre_auton(){
 
 task autonomous()
 {
-	motor[rfbDrive] = -127; // drive backwards to hit bar infront of the net
-	motor[lmDrive] = -127; // drive backwards to hit bar infront of the net
-	motor[lfbDrive] = -127; // drive backwards to hit bar infront of the net
-	motor[rmDrive] = -127; // drive backwards to hit bar infront of the net
+	switch( MyAutonomous ) {
+				case    0:
+				motor[rfbDrive] = -127; // drive backwards to hit bar infront of the net
+				motor[lmDrive] = -127; // drive backwards to hit bar infront of the net
+				motor[lfbDrive] = -127; // drive backwards to hit bar infront of the net
+				motor[rmDrive] = -127; // drive backwards to hit bar infront of the net
 
-	wait1Msec(3250); // drive backwards
+				wait1Msec(3250); // drive backwards
 
-	motor[rfbDrive] = 0; // set all drive = 0 so it stops
-	motor[lmDrive] = 0; // set all drive = 0 so it stops
-	motor[lfbDrive] = 0; // set all drive = 0 so it stops
-	motor[rmDrive] = 0; // set all drive = 0 so it stops
+				motor[rfbDrive] = 0; // set all drive = 0 so it stops
+				motor[lmDrive] = 0; // set all drive = 0 so it stops
+				motor[lfbDrive] = 0; // set all drive = 0 so it stops
+				motor[rmDrive] = 0; // set all drive = 0 so it stops
 
-	wait1Msec(10); // take a break
+				wait1Msec(10); // take a break
 
-	motor[l1] = 68; // rev launcher up to 68 power
-	motor[l2] = 68; // rev launcher up to 68 power
-	motor[l3] = 68; // rev launcher up to 68 power
-	motor[l4] = 68; // rev launcher up to 68 power
+				motor[l1] = 68; // rev launcher up to 68 power
+				motor[l2] = 68; // rev launcher up to 68 power
+				motor[l3] = 68; // rev launcher up to 68 power
+				motor[l4] = 68; // rev launcher up to 68 power
 
-	wait1Msec(3000); // ramp up launcher
+				wait1Msec(3000); // ramp up launcher
 
-	motor[lin] = -127; // outake for (400) Msec to launch first ball
-	motor[rin] = -127; // outake for (400) Msec to launch first ball
+				motor[lin] = -127; // outake for (400) Msec to launch first ball
+				motor[rin] = -127; // outake for (400) Msec to launch first ball
 
-	wait1Msec(300); // outake
+				wait1Msec(300); // outake
 
-	motor[lin] = 0; // stop outake
-	motor[rin] = 0; // stop outake
+				motor[lin] = 0; // stop outake
+				motor[rin] = 0; // stop outake
 
-	wait1Msec(500); // wait 1/2 second
+				wait1Msec(500); // wait 1/2 second
 
-	motor[lin] = -127; // outake second ball
-	motor[rin] = -127; // outake second ball
+				motor[lin] = -127; // outake second ball
+				motor[rin] = -127; // outake second ball
 
-	wait1Msec(300); // wait 7/10 of a second
+				wait1Msec(300); // wait 7/10 of a second
 
-	motor[lin] = 0; // stop outake
-	motor[rin] = 0; // stop outake
+				motor[lin] = 0; // stop outake
+				motor[rin] = 0; // stop outake
 
-	wait1Msec(500); // wait 1/2 second
+				wait1Msec(500); // wait 1/2 second
 
-	motor[lin] = -127; // outake
-	motor[rin] = -127; // outake
+				motor[lin] = -127; // outake
+				motor[rin] = -127; // outake
 
-	wait1Msec(300); // do it for 7/10 second
+				wait1Msec(300); // do it for 7/10 second
 
-	motor[lin] = 0; // stop outake
-	motor[rin] = 0; // stop outake
+				motor[lin] = 0; // stop outake
+				motor[rin] = 0; // stop outake
 
-	wait1Msec(500); // wait again
+				wait1Msec(500); // wait again
 
-	motor[lin] = -127; // outake
-	motor[rin] = -127; // outake
+				motor[lin] = -127; // outake
+				motor[rin] = -127; // outake
 
-	wait1Msec(1000); // final outtake
+				wait1Msec(1000); // final outtake
 
-	motor[lin] = 0; // stop outake
-	motor[rin] = 0; // stop outake
+				motor[lin] = 0; // stop outake
+				motor[rin] = 0; // stop outake
+
+						break;
+
+				case    1:
+				/////////////////////////////////////////////////////////////////////////////////////////
+				//
+				//                          Autonomous
+				//														 RED wall near blue goal
+				//														 RED
+				//														 RED
+				//														 RED
+				//														 RED
+				//														 RED
+				//														 RED
+				//														 RED
+				//														 RED
+				//														 RED
+				/////////////////////////////////////////////////////////////////////////////////////////
+
+
+				task autonomous()
+				{
+					motor[rfbDrive] = -127; // drive backwards
+					motor[lmDrive] = -127; // drive backwards
+					motor[lfbDrive] = -127; // drive backwards
+					motor[rmDrive] = -127; // drive backwards
+
+					wait1Msec(500); // drive backwards
+
+					motor[rfbDrive] = 0; // set all drive = 0 so it stops
+					motor[lmDrive] = 0; // set all drive = 0 so it stops
+					motor[lfbDrive] = 0; // set all drive = 0 so it stops
+					motor[rmDrive] = 0; // set all drive = 0 so it stops
+
+				wait1Msec(10); // mg
+
+				motor[rfbDrive] = 127; // turn  *****Change for Blue*****
+				motor[lmDrive] = -127; //
+				motor[lfbDrive] = -127; //
+				motor[rmDrive] = 127; //
+
+				wait1Msec(300);
+
+				motor[rfbDrive] = 0; // set all drive = 0 so it stops
+				motor[lmDrive] = 0; // set all drive = 0 so it stops
+				motor[lfbDrive] = 0; // set all drive = 0 so it stops
+				motor[rmDrive] = 0; // set all drive = 0 so it stops
+
+				wait1Msec(10); // mg
+
+				motor[rfbDrive] = -127; // drive backwards
+				motor[lmDrive] = -127; // drive backwards
+				motor[lfbDrive] = -127; // drive backwards
+				motor[rmDrive] = -127; // drive backwards
+
+				wait1Msec(2250); // drive backwards
+
+				motor[rfbDrive] = 0; // set all drive = 0 so it stops
+				motor[lmDrive] = 0; // set all drive = 0 so it stops
+				motor[lfbDrive] = 0; // set all drive = 0 so it stops
+				motor[rmDrive] = 0; // set all drive = 0 so it stops
+
+				wait1Msec(10); // mg
+
+				motor[rfbDrive] = -127; // turn other way  *****Change for Blue*****
+				motor[lmDrive] = 127; //
+				motor[lfbDrive] = 127; //
+				motor[rmDrive] = -127; //
+
+				wait1Msec(250);
+
+				motor[rfbDrive] = 0; // set all drive = 0 so it stops
+				motor[lmDrive] = 0; // set all drive = 0 so it stops
+				motor[lfbDrive] = 0; // set all drive = 0 so it stops
+				motor[rmDrive] = 0; // set all drive = 0 so it stops
+
+				wait1Msec(10); // mg
+
+				motor[rfbDrive] = -127; // drive backwards
+				motor[lmDrive] = -127; // drive backwards
+				motor[lfbDrive] = -127; // drive backwards
+				motor[rmDrive] = -127; // drive backwards
+
+				wait1Msec(500); // drive backwards
+
+				motor[rfbDrive] = 0; // set all drive = 0 so it stops
+				motor[lmDrive] = 0; // set all drive = 0 so it stops
+				motor[lfbDrive] = 0; // set all drive = 0 so it stops
+				motor[rmDrive] = 0; // set all drive = 0 so it stops
+
+				wait1Msec(10); // mg
+
+				motor[rfbDrive] = -127; // drive right side ONLY backwards
+				motor[rmDrive] = -127; // drive right side ONLY backwards
+
+				wait1Msec(250); // drive backwards
+
+				motor[rfbDrive] = 0; // set all drive = 0 so it stops
+				motor[lmDrive] = 0; // set all drive = 0 so it stops
+				motor[lfbDrive] = 0; // set all drive = 0 so it stops
+				motor[rmDrive] = 0; // set all drive = 0 so it stops
+
+				wait1Msec(10); // mg
+
+				//////////////////
+				//
+				//		Launcher
+				//
+				//////////////////
+
+					motor[l1] = 67; // rev launcher up to 67 power
+					motor[l2] = 67; // rev launcher up to 67 power
+					motor[l3] = 67; // rev launcher up to 67 power
+					motor[l4] = 67; // rev launcher up to 67 power
+
+					wait1Msec(3000); // ramp up launcher
+
+					motor[lin] = -127; // outake for (400) Msec to launch first ball
+					motor[rin] = -127; // outake for (400) Msec to launch first ball
+
+					wait1Msec(400); // outake
+
+					motor[lin] = 0; // stop outake
+					motor[rin] = 0; // stop outake
+
+					wait1Msec(500); // wait 1/2 second
+
+					motor[lin] = -127; // outake second ball
+					motor[rin] = -127; // outake second ball
+
+					wait1Msec(700); // wait 7/10 of a second
+
+					motor[lin] = 0; // stop outake
+					motor[rin] = 0; // stop outake
+
+					wait1Msec(500); // wait 1/2 second
+
+					motor[lin] = -127; // outake
+					motor[rin] = -127; // outake
+
+					wait1Msec(700); // do it for 7/10 second
+
+					motor[lin] = 0; // stop outake
+					motor[rin] = 0; // stop outake
+
+					wait1Msec(500); // wait again
+
+					motor[lin] = -127; // outake
+					motor[rin] = -127; // outake
+
+					wait1Msec(1000); // turn intake off
+
+					motor[lin] = 0; // stop outake
+					motor[rin] = 0; // stop outake
+						break;
+
+				case    2:
+				/////////////////////////////////////////////////////////////////////////////////////////
+				//
+				//                          Autonomous
+				//														 BLUE wall near RED goal
+				//														 BLUE
+				//														 BLUE
+				//														 BLUE
+				//														 BLUE
+				//														 BLUE
+				//														 BLUE
+				//														 BLUE
+				//														 BLUE
+				//														 BLUE
+				/////////////////////////////////////////////////////////////////////////////////////////
+
+
+				task autonomous()
+				{
+					motor[rfbDrive] = -127; // drive backwards
+					motor[lmDrive] = -127; // drive backwards
+					motor[lfbDrive] = -127; // drive backwards
+					motor[rmDrive] = -127; // drive backwards
+
+					wait1Msec(500); // drive backwards
+
+					motor[rfbDrive] = 0; // set all drive = 0 so it stops
+					motor[lmDrive] = 0; // set all drive = 0 so it stops
+					motor[lfbDrive] = 0; // set all drive = 0 so it stops
+					motor[rmDrive] = 0; // set all drive = 0 so it stops
+
+				wait1Msec(10); // mg
+
+				motor[rfbDrive] = -127; // turn
+				motor[lmDrive] = 127; //
+				motor[lfbDrive] = 127; //
+				motor[rmDrive] = -127; //
+
+				wait1Msec(300);
+
+				motor[rfbDrive] = 0; // set all drive = 0 so it stops
+				motor[lmDrive] = 0; // set all drive = 0 so it stops
+				motor[lfbDrive] = 0; // set all drive = 0 so it stops
+				motor[rmDrive] = 0; // set all drive = 0 so it stops
+
+				wait1Msec(10); // mg
+
+				motor[rfbDrive] = -127; // drive backwards
+				motor[lmDrive] = -127; // drive backwards
+				motor[lfbDrive] = -127; // drive backwards
+				motor[rmDrive] = -127; // drive backwards
+
+				wait1Msec(2250); // drive backwards
+
+				motor[rfbDrive] = 0; // set all drive = 0 so it stops
+				motor[lmDrive] = 0; // set all drive = 0 so it stops
+				motor[lfbDrive] = 0; // set all drive = 0 so it stops
+				motor[rmDrive] = 0; // set all drive = 0 so it stops
+
+				wait1Msec(10); // mg
+
+				motor[rfbDrive] = 127; // turn other way
+				motor[lfbDrive] = -127; //
+				motor[rmDrive] = 127; //
+
+				wait1Msec(250);
+
+				motor[rfbDrive] = 0; // set all drive = 0 so it stops
+				motor[lmDrive] = 0; // set all drive = 0 so it stops
+				motor[lfbDrive] = 0; // set all drive = 0 so it stops
+				motor[rmDrive] = 0; // set all drive = 0 so it stops
+
+				wait1Msec(10); // mg
+
+				motor[rfbDrive] = -127; // drive backwards
+				motor[lmDrive] = -127; // drive backwards
+				motor[lfbDrive] = -127; // drive backwards
+				motor[rmDrive] = -127; // drive backwards
+
+				wait1Msec(500); // drive backwards
+
+				motor[rfbDrive] = 0; // set all drive = 0 so it stops
+				motor[lmDrive] = 0; // set all drive = 0 so it stops
+				motor[lfbDrive] = 0; // set all drive = 0 so it stops
+				motor[rmDrive] = 0; // set all drive = 0 so it stops
+
+				wait1Msec(10); // mg
+
+				motor[lfbDrive] = -127; // drive left side ONLY backwards
+				motor[lmDrive] = -127; // drive left side ONLY backwards
+
+				wait1Msec(250); // drive backwards
+
+				motor[rfbDrive] = 0; // set all drive = 0 so it stops
+				motor[lmDrive] = 0; // set all drive = 0 so it stops
+				motor[lfbDrive] = 0; // set all drive = 0 so it stops
+				motor[rmDrive] = 0; // set all drive = 0 so it stops
+
+				wait1Msec(10); // mg
+
+				//////////////////
+				//
+				//		Launcher
+				//
+				//////////////////
+
+					motor[l1] = 67; // rev launcher up to 67 power
+					motor[l2] = 67; // rev launcher up to 67 power
+					motor[l3] = 67; // rev launcher up to 67 power
+					motor[l4] = 67; // rev launcher up to 67 power
+
+					wait1Msec(3000); // ramp up launcher
+
+					motor[lin] = -127; // outake for (400) Msec to launch first ball
+					motor[rin] = -127; // outake for (400) Msec to launch first ball
+
+					wait1Msec(400); // outake
+
+					motor[lin] = 0; // stop outake
+					motor[rin] = 0; // stop outake
+
+					wait1Msec(500); // wait 1/2 second
+
+					motor[lin] = -127; // outake second ball
+					motor[rin] = -127; // outake second ball
+
+					wait1Msec(700); // wait 7/10 of a second
+
+					motor[lin] = 0; // stop outake
+					motor[rin] = 0; // stop outake
+
+					wait1Msec(500); // wait 1/2 second
+
+					motor[lin] = -127; // outake
+					motor[rin] = -127; // outake
+
+					wait1Msec(700); // do it for 7/10 second
+
+					motor[lin] = 0; // stop outake
+					motor[rin] = 0; // stop outake
+
+					wait1Msec(500); // wait again
+
+					motor[lin] = -127; // outake
+					motor[rin] = -127; // outake
+
+					wait1Msec(1000); // turn intake off
+
+					motor[lin] = 0; // stop outake
+					motor[rin] = 0; // stop outake
+
+						break;
+
+				default:
+						break;
+				}
 
 }
 
@@ -157,6 +597,23 @@ task usercontrol(){
 	// User convtrol code here, inside the loop
 	displayScreenStyle(MHLCDScreenStyleVoltage);
 	while (true){
+
+		clearLCDLine(0);											// Clear line 1 (0) of the LCD
+		clearLCDLine(1);											// Clear line 2 (1) of the LCD
+
+		//Display the Primary Robot battery voltage
+		displayLCDString(0, 0, "Primary: ");
+		sprintf(mainBattery, "%1.2f%c", nImmediateBatteryLevel/1000.0,'V'); //Build the value to be displayed
+		displayNextLCDString(mainBattery);
+
+		//Display the Backup battery voltage
+		displayLCDString(1, 0, "Backup: ");
+		sprintf(backupBattery, "%1.2f%c", BackupBatteryLevel/1000.0, 'V');	//Build the value to be displayed
+		displayNextLCDString(backupBattery);
+
+		//Short delay for the LCD refresh rate
+		wait1Msec(100);
+
 
 	  drive(vexRT[Ch3], vexRT[Ch2]);//controller drive
 	  int dir = vexRT[Btn5U] ? 1 : vexRT[Btn5D] ? -1 : 0;
